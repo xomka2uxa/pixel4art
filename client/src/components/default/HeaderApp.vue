@@ -1,20 +1,18 @@
 <template>
   <div class="header">
-    <div class="container">
-      <div class="header__inner">
-        <div class="logo">
-          <a href="index.html">
-            <img src="" alt="PIX4ART">
-            PIX4ARTSSS
-          </a>
-        </div>
-        <div class="header__nav">
-          <ul>
-            <li><a href="#">Свободное рисование</a></li>
-            <li><a href="#">Блог</a></li>
-            <li><a href="contacts.html">Контакты</a></li>
-          </ul>
-        </div>
+    <div class="container header__inner">
+      <div class="logo">
+        <a href="index.html">
+          <img src="" alt="PIX4ART">
+          PIX4ARTSSS
+        </a>
+      </div>
+      <div class="header__nav">
+        <ul>
+          <li><a href="#">Свободное рисование</a></li>
+          <li><a href="#">Блог</a></li>
+          <li><a href="contacts.html">Контакты</a></li>
+        </ul>
       </div>
     </div>
   </div>
@@ -29,6 +27,13 @@ export default {
 <style lang="scss" scoped>
   .header {
     background-color: beige;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    min-height: 60px;
+    display: flex;
+    z-index: 2;
 
     &__inner {
       display: flex;

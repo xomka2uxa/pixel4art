@@ -25,10 +25,17 @@ export default {
     background-color: black;
     color: aliceblue;
     padding: 15px 0;
-
-    .container{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    min-height: 60px;
     display: flex;
-    justify-content: space-between;
+    z-index: 2;
+
+    .container {
+      display: flex;
+      justify-content: space-between;
     }
 }
 </style>

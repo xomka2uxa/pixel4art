@@ -43,6 +43,10 @@ body {
     width: 100%;
     min-height: 100vh;
 }
+.main {
+  min-height: 100vh;
+  padding: 90px 0;
+}
 h2, h3, p{
     margin-top: 0;
 }
