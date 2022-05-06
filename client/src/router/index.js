@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import HomeView from '../views/HomeView.vue';
 import PostsView from '../views/PostsView.vue';
 import FreePaint from '../views/FreePaint.vue';
+import PaintKonva from '../views/PaintKonva.vue';
 
 const routes = [
   {
@@ -13,6 +14,11 @@ const routes = [
     path: '/free-paint',
     name: 'FreePaint',
     component: FreePaint,
+  },
+  {
+    path: '/paint-konva',
+    name: 'PaintKonva',
+    component: PaintKonva,
   },
   {
     path: '/posts',

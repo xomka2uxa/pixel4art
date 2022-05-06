@@ -11,6 +11,7 @@
         <div class="header__nav">
           <ul>
             <li><router-link to="/free-paint">Свободное рисование</router-link></li>
+            <li><router-link to="/paint-konva">конва</router-link></li>
             <li><a href="#">Блог</a></li>
             <li><a href="contacts.html">Контакты</a></li>
           </ul>
