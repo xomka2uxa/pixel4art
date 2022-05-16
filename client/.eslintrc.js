@@ -17,5 +17,6 @@ module.exports = {
     'no-nested-ternary': 'off',
     'max-len': ['error', { code: 150 }],
     'vuejs-accessibility/click-events-have-key-events': 'off',
+    'vue/no-deprecated-slot-attribute': 'off',
   },
 };

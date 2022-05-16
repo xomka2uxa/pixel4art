@@ -1,54 +1,123 @@
 <template>
-  <div v-bind:style="{ height: '100vh', width: '100vw' }" ref="container">
-    <v-stage
-      ref="stage"
-      :config="{...stageConfig}"
-      @mousedown="handleClick"
-      @mousemove="handleClick"
-      @mouseup="handleClick"
-    >
-      <v-layer>
-        <v-group
-          ref="group"
-          :config="{ ...groupConfig, draggable: isDragging }"
-          @wheel="handleScale"
-          @dragstart="handleDragStart"
-          @dragmove="handleDragMove"
-          @dragend="handleDragEnd"
-        >
-          <v-line
-            v-for="(line, i) in vLineList"
-            :key="i"
-            :config="{
-              ...line
-            }"
-          />
-          <v-line
-            v-for="(line, i) in hLineList"
-            :key="i"
-            :config="{
-              ...line
-            }"
-          />
-          <v-rect
-            v-for="(rect, i) in rectList"
-            :key="i"
-            :config="{
-              ...rect
-            }"
-          />
-        </v-group>
-      </v-layer>
-      <v-layer ref="dragLayer"></v-layer>
-    </v-stage>
+  <div>
+    <div v-bind:style="{ height: '100vh', width: '100vw' }" ref="container">
+      <v-stage
+        ref="stage"
+        :config="{...stageConfig}"
+        @mousedown="handleClick"
+        @mousemove="handleClick"
+        @mouseup="handleClick"
+      >
+        <v-layer>
+          <v-group
+            ref="group"
+            :config="{ ...groupConfig, draggable: isDragging }"
+            @wheel="handleScale"
+            @dragstart="handleDragStart"
+            @dragmove="handleDragMove"
+            @dragend="handleDragEnd"
+          >
+            <v-line
+              v-for="(line, i) in vLineList"
+              :key="i"
+              :config="{
+                ...line
+              }"
+            />
+            <v-line
+              v-for="(line, i) in hLineList"
+              :key="i"
+              :config="{
+                ...line
+              }"
+            />
+            <v-rect
+              v-for="(rect, i) in rectList"
+              :key="i"
+              :config="{
+                ...rect
+              }"
+            />
+          </v-group>
+        </v-layer>
+        <v-layer ref="dragLayer"></v-layer>
+      </v-stage>
+    </div>
+    <div class="left-sidebar">
+      <div class="left-sidebar__inner">
+        <div class="choose-color">
+          <Popper>
+            <button>Выбрать цвет</button>
+            <template #content>
+              <color-picker color="#fff" default-format="hex" class="color-picker" @color-change="updateColor">
+                <template #copy-button>
+                  <svg
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="15"
+                    height="15"
+                    viewBox="0 0 15 15"
+                  >
+                    <path
+                      d="M5 0v2H1v13h12v-3h-1v2H2V5h10v3h1V2H9V0zm1 1h2v2h3v1H3V3h3z"
+                      fill="currentColor"
+                    />
+
+                    <path
+                      d="M10 7v2h5v2h-5v2l-3-3zM3 6h5v1H3zm0 2h3v1H3zm0 2h3v1H3zm0 2h5v1H3z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                </template>
+
+                <template #format-switch-button>
+                  <span class="sr-only">Выбрать формат</span>
+                  <svg
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="15"
+                    viewBox="0 0 16 15"
+                  >
+                    <path
+                      d="M8 15l5-5-1-1-4 2-4-2-1 1zm4-9l1-1-5-5-5 5 1 1 4-2z"
+                      fill="currentColor"
+                    />
+                  </svg>
+                </template>
+              </color-picker>
+            </template>
+          </Popper>
+        </div>
+        <div class="colors-list">
+          <div
+            v-for="(color, idx) in colorsList"
+            :key="idx"
+            :class="['colors-item', {selected: color == currentColor}]"
+            :style="['background:' + color]"
+            @click="chooseCurrentColor(color)"
+          ></div>
+        </div>
+        <button @click="addColorList">Добавить в палитру</button>
+        <button @click="deleteColorList">Удалить из палитры</button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
+import { ColorPicker } from 'vue-accessible-color-picker';
+import Popper from 'vue3-popper';
+
 const width = window.innerWidth;
 const height = window.innerHeight;
 
 export default {
+  components: {
+    ColorPicker,
+    Popper,
+  },
+
   data() {
     return {
       isClick: false,
@@ -74,6 +143,8 @@ export default {
       vLineList: [],
       hLineList: [],
       rectList: [],
+      colorsList: [],
+      currentColor: '',
     };
   },
   created() {
@@ -254,14 +325,14 @@ export default {
       }
       if (event.type === 'mouseup') {
         if (this.getClassName(event.target) === 'Rect' && this.isClick && !this.isDragging && !this.isDraggingEdge) {
-          event.target.fill('red');
+          event.target.fill(this.currentColor);
         }
         this.isClick = false;
         this.isDragging = true;
         this.isDraggingEdge = false;
       }
       if (this.getClassName(event.target) === 'Rect' && this.isClick && !this.isDragging && !this.isDraggingEdge) {
-        event.target.fill('red');
+        event.target.fill(this.currentColor);
       }
     },
 
@@ -299,24 +370,67 @@ export default {
       } // otherwise, access the class using obj.constructor.name
       return obj.constructor.name;
     },
+
+    updateColor(eventData) {
+      this.currentColor = eventData.cssColor;
+    },
+
+    addColorList() {
+      if (!this.colorsList.includes(this.currentColor)) {
+        this.colorsList.push(this.currentColor);
+      }
+    },
+
+    chooseCurrentColor(color) {
+      this.currentColor = color;
+    },
+
+    deleteColorList() {
+      this.colorsList = this.colorsList.filter((el) => this.currentColor !== el);
+      this.currentColor = '#fff';
+    },
   },
 };
 </script>
+<style lang="scss" scoped>
+  .left-sidebar {
+    position: fixed;
+    width: 160px;
+    top: 60px;
+    left: 0;
+    bottom: 0;
+    background: rgb(246, 246, 246);
+    padding: 10px;
+
+    .color-picker {
+      min-width: 300px;
+    }
+
+    .colors-list {
+      padding: 10px 0;
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .colors-item {
+      position: relative;
+      width: 20px;
+      height: 20px;
+
+      &.selected:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border: 3px solid rgba(0, 0, 0, .3);
+      }
+    }
+  }
+</style>
+
 <!--
-закрашивать если клик или маусемув и клавиша зажата ++++
-// закрашвать на мобилах так же
-центрировать по высоте и цирине ++++
-перетаскивать всю картинку драг н дропом +++++
-изменять масштаб по калесику +++
-// и на мобиле по пальцам.
-
-начальное состояние - это 60% от ширины экрана
-
-ресайзить при изменении размера экрана и при ресайзе пересчитыватьь то, что выше
-
-при перемещении не давать выходить за границы бльше чем на 80% от картинки
-
-при масштабировании не давать уменьшать менее чем на 80% от ширины экрана
 
 сделать выбор размера + задать свой
 сделать выбор цвета
