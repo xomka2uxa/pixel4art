@@ -3,6 +3,7 @@ import HomeView from '../views/HomeView.vue';
 import PostsView from '../views/PostsView.vue';
 import FreePaint from '../views/FreePaint.vue';
 import PaintKonva from '../views/PaintKonva.vue';
+import PaintCanvas from '../views/PaintCanvas.vue';
 
 const routes = [
   {
@@ -19,6 +20,11 @@ const routes = [
     path: '/paint-konva',
     name: 'PaintKonva',
     component: PaintKonva,
+  },
+  {
+    path: '/paint-canvas',
+    name: 'PaintCanvas',
+    component: PaintCanvas,
   },
   {
     path: '/posts',
