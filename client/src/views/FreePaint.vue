@@ -89,17 +89,33 @@
             </template>
           </Popper>
         </div>
-        <div class="colors-list">
-          <div
-            v-for="(color, idx) in colorsList"
-            :key="idx"
-            :class="['colors-item', {selected: color == currentColor}]"
-            :style="['background:' + color]"
-            @click="chooseCurrentColor(color)"
-          ></div>
+        <hr>
+        <div class="colors">
+          <p>Палитра</p>
+          <div v-if="colorsList.length" class="colors-list">
+            <div
+              v-for="(color, idx) in colorsList"
+              :key="idx"
+              :class="['colors-item', {selected: color == currentColor}]"
+              :style="['background:' + color]"
+              @click="chooseCurrentColor(color)"
+            ></div>
+          </div>
+          <div class="colors-btn">
+            <button @click="addColorList">Доб-ть</button>
+            <button @click="deleteColorList">Уд-ть</button>
+          </div>
         </div>
-        <button @click="addColorList">Добавить в палитру</button>
-        <button @click="deleteColorList">Удалить из палитры</button>
+        <hr>
+        <div class="sizes">
+          <p>Размеры</p>
+          <select @change="changeSize">
+            <option value="1">30 x 30</option>
+            <option value="2">50 x 50</option>
+            <option value="3">100 x 100</option>
+            <option value="4">Свой вариант</option>
+          </select>
+        </div>
       </div>
     </div>
   </div>
@@ -131,7 +147,6 @@ export default {
       groupConfig: {
         width: null,
         height: null,
-
       },
       beginPaintX: 0,
       beginPaintY: 0,
@@ -140,6 +155,23 @@ export default {
         cols: 30,
         rows: 30,
       },
+      paintSizeList: [
+        {
+          value: 1,
+          cols: 30,
+          rows: 30,
+        },
+        {
+          value: 2,
+          cols: 50,
+          rows: 50,
+        },
+        {
+          value: 3,
+          cols: 100,
+          rows: 100,
+        },
+      ],
       vLineList: [],
       hLineList: [],
       rectList: [],
@@ -159,7 +191,6 @@ export default {
   methods: {
     changeRect() {
       const { container } = this.$refs;
-
       if (!container) {
         return;
       }
@@ -250,7 +281,6 @@ export default {
       let row = 0;
       let cnt = 1;
       const { pxSquare } = this.paintSize;
-
       for (let i = 0; i < this.paintSize.cols * this.paintSize.rows; i += 1) {
         this.rectList.push({
           x: pxSquare * col,
@@ -389,6 +419,37 @@ export default {
       this.colorsList = this.colorsList.filter((el) => this.currentColor !== el);
       this.currentColor = '#fff';
     },
+
+    changeSize(event) {
+      if (event.target.value !== 4) {
+        const currSize = this.paintSizeList.find((el) => +el.value === +event.target.value);
+        console.log(currSize, 999);
+        this.paintSize.cols = 768;
+        this.paintSize.rows = 576;
+      }
+      this.beginPaintX = 0;
+      this.beginPaintY = 0;
+      this.vLineList = [];
+      this.hLineList = [];
+      this.rectList = [];
+      this.stageConfig = {
+        width,
+        height,
+      };
+      this.groupConfig = {
+        width: null,
+        height: null,
+      };
+      const list = this.$refs.group.getNode().children;
+      const rects = list.filter((rect) => this.getClassName(rect) === 'Rect');
+      console.log(rects, 8);
+      rects.forEach((element) => element.fill('rgba(0, 0, 0, 0)'));
+      this.changeRect();
+      this.initGroup();
+      this.initVLineList();
+      this.initHLineList();
+      this.initRectList();
+    },
   },
 };
 </script>
@@ -407,7 +468,7 @@ export default {
     }
 
     .colors-list {
-      padding: 10px 0;
+      padding: 0 0 10px 0;
       display: flex;
       flex-wrap: wrap;
     }
