@@ -4,7 +4,7 @@
         <div class="logo">
           <a href="index.html">
             <img src="" alt="PIX4ART">
-            PIX4ART
+            PIX4ARTsss
           </a>
         </div>
         <div class="copyright">
