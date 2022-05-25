@@ -1,11 +1,16 @@
 <template>
-    <div class="container-canvas" ref="container-canvas">
+    <div
+      class="container-canvas"
+      ref="container-canvas"
+      @mousewheel="handleMouseWheel"
+      @mousedown="handleEvent"
+      @mouseup="handleEvent"
+      @mousemove="handleEvent"
+    >
       <canvas
         id="c"
         ref="c"
         :style="[canvasStyle]"
-        @click="handleClick"
-        @mousewheel="handleMouseWheel"
       >
       </canvas>
     </div>
@@ -29,6 +34,9 @@ export default {
         minScale: 0.4,
         x: 0,
         y: 0,
+        shiftX: 0,
+        shiftY: 0,
+        canMove: false,
       },
       canvasStyle: {
         top: 0,
@@ -97,53 +105,89 @@ export default {
 
       const isHeightGreater = this.canvasConfig.height * this.canvasConfig.scale
         > window.innerHeight * percentHeightScale;
-      console.log(isWidthGreater, isHeightGreater, this.canvasConfig.height, this.canvasConfig.scale, percentHeightScale, 333);
 
       if (isHeightGreater) {
         needSize = Math.floor(window.innerHeight * percentHeightScale);
         this.canvasConfig.scale = needSize / this.canvasConfig.height;
       }
 
-      // Считаем середину
-      this.beginPaintX = ((window.innerWidth - (this.canvasConfig.width * this.canvasConfig.scale)) / 2)
-        - ((this.canvasConfig.width * (1 - this.canvasConfig.scale)) / 2);
-      this.beginPaintY = ((window.innerHeight - (this.canvasConfig.height * this.canvasConfig.scale)) / 2)
-        - ((this.canvasConfig.height * (1 - this.canvasConfig.scale)) / 2);
+      // Считаем x y
+      this.canvasConfig.x = ((window.innerWidth - (this.canvasConfig.width * this.canvasConfig.scale)) / 2);
+      this.canvasConfig.y = ((window.innerHeight - (this.canvasConfig.height * this.canvasConfig.scale)) / 2);
 
       // Назначаем параметры
-      this.canvasConfig.x = this.beginPaintX;
-      this.canvasConfig.y = this.beginPaintY;
-      this.canvasStyle.left = `${this.beginPaintX}px`;
-      this.canvasStyle.top = `${this.beginPaintY}px`;
+      this.canvasStyle.left = `${this.canvasConfig.x}px`;
+      this.canvasStyle.top = `${this.canvasConfig.y}px`;
       this.canvasStyle.transform = `scale(${this.canvasConfig.scale}, ${this.canvasConfig.scale})`;
     },
 
     handleMouseWheel(e) {
-      e.preventDefault();
-      console.log(e);
-      this.minScale = window.innerWidth < 998
-        ? window.innerWidth < 768 ? 0.8 : 0.6 : 0.4;
-      const direction = e.deltaY > 0 ? -1 : 1;
-      const oldScale = this.canvasConfig.scale;
-      const newScale = direction > 0 ? oldScale * this.canvasConfig.scaleBy : oldScale / this.canvasConfig.scaleBy;
-      const mousePointTo = {
-        x: (e.clientX - this.canvasConfig.x) / oldScale,
-        y: (e.clientY - this.canvasConfig.y) / oldScale,
-      };
-      if ((direction > 0 && newScale < this.canvasConfig.maxScale) || (direction < 0 && newScale > this.canvasConfig.minScale)) {
-        this.canvasConfig.scale = newScale;
-        this.canvasStyle.transform = `scale(${this.canvasConfig.scale}, ${this.canvasConfig.scale})`;
-        // group.getNode().scale({ x: newScale, y: newScale });
+      if (e.target.id === 'c') {
+        e.preventDefault();
+        this.minScale = window.innerWidth < 998
+          ? window.innerWidth < 768 ? 0.8 : 0.6 : 0.4;
+        const direction = e.deltaY > 0 ? -1 : 1;
+        const oldScale = this.canvasConfig.scale;
+        const newScale = direction > 0 ? oldScale * this.canvasConfig.scaleBy : oldScale / this.canvasConfig.scaleBy;
 
-        const newPos = {
-          x: e.clientX - mousePointTo.x * newScale,
-          y: e.clientY - mousePointTo.y * newScale,
-        };
-        console.log(this.canvasConfig.x, 9999);
+        if ((direction > 0 && newScale < this.canvasConfig.maxScale) || (direction < 0 && newScale > this.canvasConfig.minScale)) {
+          // const mousePointTo = {
+          //   x: (e.x - this.canvasConfig.x) / oldScale,
+          //   y: (e.y - this.canvasConfig.y) / oldScale,
+          // };
 
-        this.canvasStyle.left = `${newPos.x}px`;
-        this.canvasStyle.top = `${newPos.y}px`;
+          // const newPos = {
+          //   x: e.x - mousePointTo.x * newScale,
+          //   y: e.y - mousePointTo.y * newScale,
+          // };
+          this.canvasConfig.scale = newScale;
+          this.canvasStyle.transform = `scale(${this.canvasConfig.scale}, ${this.canvasConfig.scale})`;
+          this.canvasConfig.x = ((window.innerWidth - (this.canvasConfig.width * this.canvasConfig.scale)) / 2);
+          this.canvasConfig.y = ((window.innerHeight - (this.canvasConfig.height * this.canvasConfig.scale)) / 2);
+          console.log(window.innerWidth, this.canvasConfig.width, this.canvasConfig.scale, 333);
+          this.canvasStyle.left = `${this.canvasConfig.x}px`;
+          this.canvasStyle.top = `${this.canvasConfig.y}px`;
+        }
       }
+    },
+
+    handleEvent(e) {
+      // console.log(e.type, e, 111);
+      if (e.type === 'mousedown' && e.target.id === 'c') {
+        this.canvasConfig.canMove = true;
+        this.canvasConfig.shiftX = e.clientX - this.canvasConfig.x;
+        this.canvasConfig.shiftY = e.clientY - this.canvasConfig.y;
+      }
+
+      if (e.type === 'mousemove' && this.canvasConfig.canMove) {
+        // Считаем x y
+        this.canvasConfig.x = e.pageX - this.canvasConfig.shiftX;
+        this.canvasConfig.y = e.pageY - this.canvasConfig.shiftY;
+        // Назначаем параметры
+        this.canvasStyle.left = `${this.canvasConfig.x}px`;
+        this.canvasStyle.top = `${this.canvasConfig.y}px`;
+      }
+
+      if (e.type === 'mouseup') {
+        this.canvasConfig.canMove = false;
+      }
+      // const minx = 0.15;
+      // const miny = 0.15;
+      // const maxx = 0.85;
+      // const maxy = 0.85;
+      // const noTopMove = e.target.y + (e.target.height() * e.target.scaleY()) <= this.stageConfig.height * miny;
+      // const noRightMove = e.target.x >= this.stageConfig.width * maxx;
+      // const noLeftMove = e.target.x + (e.target.width() * e.target.scaleX()) < this.stageConfig.width * minx;
+      // const noBottomMove = e.target.y >= this.stageConfig.height * maxy;
+
+      // if (noTopMove) e.target.y(e.target.y + (this.stageConfig.height * 0.05));
+      // if (noRightMove) e.target.x(e.target.x - (this.stageConfig.width * 0.05));
+      // if (noBottomMove) e.target.y(e.target.y - (this.stageConfig.height * 0.05));
+      // if (noLeftMove) e.target.x(e.target.x + (this.stageConfig.width * 0.05));
+      // if (noTopMove || noRightMove || noBottomMove || noLeftMove) {
+      //   this.isDragging = false;
+      //   this.isDraggingEdge = true;
+      // }
     },
   },
 };
@@ -160,7 +204,7 @@ export default {
     position: absolute;
     left: 0;
     top: 0;
-    border: 1px solid black;
-    transition: transform .2s;
+    // transition: transform .2s, left .2s, top .2s;
+    transform-origin: 0 0;
   }
 </style>

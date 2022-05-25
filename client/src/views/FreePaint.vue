@@ -327,7 +327,7 @@ export default {
           x: (pointer.x - group.getNode().x()) / oldScale,
           y: (pointer.y - group.getNode().y()) / oldScale,
         };
-        console.log(pointer.x, group.getNode().x(), 777);
+
         const direction = event.evt.deltaY > 0 ? -1 : 1;
 
         const newScale = direction > 0 ? oldScale * scaleBy : oldScale / scaleBy;
@@ -338,6 +338,7 @@ export default {
             x: pointer.x - mousePointTo.x * newScale,
             y: pointer.y - mousePointTo.y * newScale,
           };
+          console.log(group.getNode().x(), pointer.x, oldScale, mousePointTo, 111);
           group.getNode().position(newPos);
         }
       }
