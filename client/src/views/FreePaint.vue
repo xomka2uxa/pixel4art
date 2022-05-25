@@ -338,6 +338,7 @@ export default {
             x: pointer.x - mousePointTo.x * newScale,
             y: pointer.y - mousePointTo.y * newScale,
           };
+          console.log(group.getNode().x(), pointer.x, oldScale, mousePointTo, 111);
           group.getNode().position(newPos);
         }
       }
