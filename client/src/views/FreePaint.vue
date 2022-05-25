@@ -327,7 +327,7 @@ export default {
           x: (pointer.x - group.getNode().x()) / oldScale,
           y: (pointer.y - group.getNode().y()) / oldScale,
         };
-
+        console.log(pointer.x, group.getNode().x(), 777);
         const direction = event.evt.deltaY > 0 ? -1 : 1;
 
         const newScale = direction > 0 ? oldScale * scaleBy : oldScale / scaleBy;

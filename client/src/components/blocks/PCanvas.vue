@@ -27,6 +27,8 @@ export default {
         scaleBy: 1.08,
         maxScale: 3,
         minScale: 0.4,
+        x: 0,
+        y: 0,
       },
       canvasStyle: {
         top: 0,
@@ -109,6 +111,8 @@ export default {
         - ((this.canvasConfig.height * (1 - this.canvasConfig.scale)) / 2);
 
       // Назначаем параметры
+      this.canvasConfig.x = this.beginPaintX;
+      this.canvasConfig.y = this.beginPaintY;
       this.canvasStyle.left = `${this.beginPaintX}px`;
       this.canvasStyle.top = `${this.beginPaintY}px`;
       this.canvasStyle.transform = `scale(${this.canvasConfig.scale}, ${this.canvasConfig.scale})`;
@@ -122,21 +126,23 @@ export default {
       const direction = e.deltaY > 0 ? -1 : 1;
       const oldScale = this.canvasConfig.scale;
       const newScale = direction > 0 ? oldScale * this.canvasConfig.scaleBy : oldScale / this.canvasConfig.scaleBy;
-      // const mousePointTo = {
-      //   x: (pointer.x - group.getNode().x()) / oldScale,
-      //   y: (pointer.y - group.getNode().y()) / oldScale,
-      // };
-      console.log(direction, newScale, this.canvasConfig.maxScale, this.canvasConfig.minScale, 888);
+      const mousePointTo = {
+        x: (e.clientX - this.canvasConfig.x) / oldScale,
+        y: (e.clientY - this.canvasConfig.y) / oldScale,
+      };
       if ((direction > 0 && newScale < this.canvasConfig.maxScale) || (direction < 0 && newScale > this.canvasConfig.minScale)) {
-        console.log(newScale, this.canvasConfig.maxScale, this.canvasConfig.minScale, 888);
         this.canvasConfig.scale = newScale;
         this.canvasStyle.transform = `scale(${this.canvasConfig.scale}, ${this.canvasConfig.scale})`;
         // group.getNode().scale({ x: newScale, y: newScale });
 
-        // const newPos = {
-        //   x: pointer.x - mousePointTo.x * newScale,
-        //   y: pointer.y - mousePointTo.y * newScale,
-        // };
+        const newPos = {
+          x: e.clientX - mousePointTo.x * newScale,
+          y: e.clientY - mousePointTo.y * newScale,
+        };
+        console.log(this.canvasConfig.x, 9999);
+
+        this.canvasStyle.left = `${newPos.x}px`;
+        this.canvasStyle.top = `${newPos.y}px`;
       }
     },
   },
