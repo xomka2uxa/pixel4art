@@ -3,9 +3,9 @@
       class="container-canvas"
       ref="container-canvas"
       @mousewheel="handleMouseWheel"
-      @mousedown="handleEvent"
-      @mouseup="handleEvent"
-      @mousemove="handleEvent"
+      @mousedown="handleCanvasEvent"
+      @mouseup="handleCanvasEvent"
+      @mousemove="handleCanvasEvent"
     >
       <canvas
         id="c"
@@ -23,8 +23,8 @@ export default {
       canvas: null,
       ctx: null,
       canvasConfig: {
-        cols: 80,
-        rows: 60,
+        cols: 800,
+        rows: 600,
         squareSize: 20,
         width: 0,
         height: 0,
@@ -36,13 +36,16 @@ export default {
         y: 0,
         shiftX: 0,
         shiftY: 0,
-        canMove: false,
+        isClick: false,
       },
       canvasStyle: {
         top: 0,
         left: 0,
         transform: 'scale(1, 1)',
       },
+      isClick: false,
+      isDragging: true,
+      timer: null,
     };
   },
 
@@ -50,7 +53,7 @@ export default {
     window.addEventListener('resize', this.changeSizeCanvas);
     this.initCanvas();
     this.changeSizeCanvas();
-    this.draw();
+    this.drawLines();
   },
 
   methods: {
@@ -63,27 +66,21 @@ export default {
       this.canvas.height = this.canvasConfig.squareSize * this.canvasConfig.rows;
     },
 
-    draw() {
-      let col = 0;
-      let row = 0;
-      let cnt = 1;
-      for (let i = 0; i < this.canvasConfig.cols * this.canvasConfig.rows; i += 1) {
-        this.ctx.fillStyle = 'red';
-        this.ctx.fillRect(
-          this.canvasConfig.squareSize * col,
-          this.canvasConfig.squareSize * row,
-          this.canvasConfig.squareSize,
-          this.canvasConfig.squareSize,
-        );
-        cnt += 1;
-        col += 1;
-
-        if (cnt === this.canvasConfig.cols + 1) {
-          row += 1;
-          cnt = 1;
-          col = 0;
-        }
+    drawLines() {
+      this.ctx.beginPath();
+      for (let i = 0; i < this.canvasConfig.rows + 1; i += 1) {
+        this.ctx.moveTo(0, i * this.canvasConfig.squareSize);
+        this.ctx.lineTo(this.canvasConfig.cols * this.canvasConfig.squareSize, i * this.canvasConfig.squareSize);
       }
+
+      for (let i = 0; i < this.canvasConfig.cols + 1; i += 1) {
+        this.ctx.moveTo(i * this.canvasConfig.squareSize, 0);
+        this.ctx.lineTo(i * this.canvasConfig.squareSize, this.canvasConfig.rows * this.canvasConfig.squareSize);
+      }
+
+      this.ctx.strokeStyle = '#000';
+      this.ctx.lineWidth = 1;
+      this.ctx.stroke();
     },
 
     changeSizeCanvas() {
@@ -144,50 +141,83 @@ export default {
           this.canvasStyle.transform = `scale(${this.canvasConfig.scale}, ${this.canvasConfig.scale})`;
           this.canvasConfig.x = ((window.innerWidth - (this.canvasConfig.width * this.canvasConfig.scale)) / 2);
           this.canvasConfig.y = ((window.innerHeight - (this.canvasConfig.height * this.canvasConfig.scale)) / 2);
-          console.log(window.innerWidth, this.canvasConfig.width, this.canvasConfig.scale, 333);
           this.canvasStyle.left = `${this.canvasConfig.x}px`;
           this.canvasStyle.top = `${this.canvasConfig.y}px`;
         }
       }
     },
 
-    handleEvent(e) {
-      // console.log(e.type, e, 111);
+    timeoutDragStart(e) {
+      const isDrag = () => {
+        this.isDragging = false;
+        this.drawRect(e);
+      };
+
+      this.timer = setTimeout(isDrag, 100);
+    },
+
+    timeoutDragStop() {
+      clearTimeout(this.timer);
+    },
+
+    drawRect(e) {
+      /*
+      считаем, где нарисовать квадрат.
+      надо взять положение мыши
+      минус положение канваса.
+      по горизонтали умножить количество строк на ширину квадрата
+      */
+
+      const shiftX = e.pageX - this.canvasConfig.x;
+      const RealWidthCanvas = this.canvasConfig.cols * this.canvasConfig.squareSize * this.canvasConfig.scale;
+      const realSquareSizeX = RealWidthCanvas / this.canvasConfig.cols;
+      const shiftRectX = Math.floor(shiftX / realSquareSizeX);
+
+      const shiftY = e.pageY - this.canvasConfig.y - 60;
+      const RealHeightCanvas = this.canvasConfig.rows * this.canvasConfig.squareSize * this.canvasConfig.scale;
+      const realSquareSizeY = RealHeightCanvas / this.canvasConfig.rows;
+      const shiftRectY = Math.floor(shiftY / realSquareSizeY);
+      // знаем разницу в положении. знаем шириниу канваса. вычитаем одно из другого. делим
+      // умножаем
+
+      //  let x = 0;
+      //  let y = 0;
+      console.log(shiftRectX * this.canvasConfig.squareSize, shiftRectY * this.canvasConfig.squareSize, 9999);
+      this.ctx.fillStyle = 'red';
+      this.ctx.fillRect(
+        shiftRectX * this.canvasConfig.squareSize,
+        shiftRectY * this.canvasConfig.squareSize,
+        this.canvasConfig.squareSize,
+        this.canvasConfig.squareSize,
+      );
+    },
+
+    handleCanvasEvent(e) {
       if (e.type === 'mousedown' && e.target.id === 'c') {
-        this.canvasConfig.canMove = true;
+        this.canvasConfig.isClick = true;
+        this.timeoutDragStart(e);
         this.canvasConfig.shiftX = e.clientX - this.canvasConfig.x;
         this.canvasConfig.shiftY = e.clientY - this.canvasConfig.y;
       }
 
-      if (e.type === 'mousemove' && this.canvasConfig.canMove) {
-        // Считаем x y
-        this.canvasConfig.x = e.pageX - this.canvasConfig.shiftX;
-        this.canvasConfig.y = e.pageY - this.canvasConfig.shiftY;
-        // Назначаем параметры
-        this.canvasStyle.left = `${this.canvasConfig.x}px`;
-        this.canvasStyle.top = `${this.canvasConfig.y}px`;
+      if (e.type === 'mousemove' && this.canvasConfig.isClick) {
+        this.timeoutDragStop();
+        if (this.isDragging) {
+          // Считаем x y
+          this.canvasConfig.x = e.pageX - this.canvasConfig.shiftX;
+          this.canvasConfig.y = e.pageY - this.canvasConfig.shiftY;
+          // Назначаем параметры
+          this.canvasStyle.left = `${this.canvasConfig.x}px`;
+          this.canvasStyle.top = `${this.canvasConfig.y}px`;
+        } else {
+          this.drawRect(e);
+        }
       }
 
       if (e.type === 'mouseup') {
-        this.canvasConfig.canMove = false;
+        this.canvasConfig.isClick = false;
+        this.isDragging = true;
       }
-      // const minx = 0.15;
-      // const miny = 0.15;
-      // const maxx = 0.85;
-      // const maxy = 0.85;
-      // const noTopMove = e.target.y + (e.target.height() * e.target.scaleY()) <= this.stageConfig.height * miny;
-      // const noRightMove = e.target.x >= this.stageConfig.width * maxx;
-      // const noLeftMove = e.target.x + (e.target.width() * e.target.scaleX()) < this.stageConfig.width * minx;
-      // const noBottomMove = e.target.y >= this.stageConfig.height * maxy;
-
-      // if (noTopMove) e.target.y(e.target.y + (this.stageConfig.height * 0.05));
-      // if (noRightMove) e.target.x(e.target.x - (this.stageConfig.width * 0.05));
-      // if (noBottomMove) e.target.y(e.target.y - (this.stageConfig.height * 0.05));
-      // if (noLeftMove) e.target.x(e.target.x + (this.stageConfig.width * 0.05));
-      // if (noTopMove || noRightMove || noBottomMove || noLeftMove) {
-      //   this.isDragging = false;
-      //   this.isDraggingEdge = true;
-      // }
     },
   },
 };
