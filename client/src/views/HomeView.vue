@@ -1,7 +1,5 @@
 <template>
-  <div class="main">
-
-  </div>
+  <div class="main"></div>
 </template>
 
 <script>
@@ -9,13 +7,11 @@
 // import HelloWorld from '@/components/HelloWorld.vue';
 
 export default {
-  name: 'HomeView',
+  name: "HomeView",
   components: {
     //    HelloWorld,
   },
 };
 </script>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>
