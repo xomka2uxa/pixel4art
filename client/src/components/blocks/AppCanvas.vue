@@ -67,13 +67,28 @@ export default {
 
   mounted() {
     window.addEventListener("resize", this.changeSizeCanvas);
+    this.cc.cols = this.selectedSizePaint.value[0];
+    this.cc.rows = this.selectedSizePaint.value[1];
     this.initCanvas();
     this.changeSizeCanvas();
     this.draw();
   },
 
+  watch: {
+    "$store.state.selectedSizePaint": {
+      handler(val) {
+        this.rectList = [];
+        this.cc.cols = val.value[0];
+        this.cc.rows = val.value[1];
+
+        this.changeSizeCanvas();
+      },
+      deep: true,
+    },
+  },
+
   computed: {
-    ...mapGetters(["getSelectedColor"]),
+    ...mapGetters(["selectedColor", "selectedSizePaint"]),
   },
 
   methods: {
@@ -94,8 +109,6 @@ export default {
       this.initCanvas(false);
       this.initScale();
       this.initGroup();
-      this.drawGroup();
-      this.drawLines();
     },
 
     initCanvas(firstInit = true) {
@@ -124,7 +137,7 @@ export default {
 
     drawLines() {
       this.ctx.beginPath();
-      for (let i = 0; i < this.cc.rows + 1; i += 1) {
+      for (let i = 0; i < this.cc.rows + 1; i++) {
         this.ctx.moveTo(
           this.gc.x,
           this.gc.y + i * this.cc.squareSize * this.cc.scale
@@ -135,7 +148,7 @@ export default {
         );
       }
 
-      for (let i = 0; i < this.cc.cols + 1; i += 1) {
+      for (let i = 0; i < this.cc.cols + 1; i++) {
         this.ctx.moveTo(
           this.gc.x + i * this.cc.squareSize * this.cc.scale,
           this.gc.y
@@ -174,7 +187,7 @@ export default {
       const shiftY = e.offsetY - this.gc.y;
       const realSquareSizeY = this.gc.height / this.cc.rows;
       const shiftRectY = Math.floor(shiftY / realSquareSizeY);
-      const color = this.getSelectedColor;
+      const color = this.selectedColor;
       this.ctx.fillStyle = color;
       this.rectList.push({
         col: shiftRectX,
@@ -205,7 +218,6 @@ export default {
       } else if (!isNeedScaleWidth && groupHeight > this.cc.height) {
         this.cc.scale = (this.cc.height / groupHeight) * percentScale;
       }
-      console.log(this.cc.scale, 9999);
     },
 
     handleCanvasEvent(e) {
@@ -230,10 +242,12 @@ export default {
 
         if (e.type === "mouseup") {
           this.cc.isClick = false;
+          this.timeoutDragStop();
           this.isDragging = true;
         }
       } else {
         this.cc.isClick = false;
+        this.timeoutDragStop();
         this.isDragging = true;
       }
     },
@@ -281,20 +295,9 @@ export default {
           this.gc.width = this.cc.cols * this.cc.squareSize * this.cc.scale;
           this.gc.height = this.cc.rows * this.cc.squareSize * this.cc.scale;
 
-          // const mousePointTo = {
-          //   x: (e.offsetX - this.gc.x) / oldScale,
-          //   y: (e.offsetY - this.gc.y) / oldScale,
-          // };
-
-          // const newPos = {
-          //   x: e.x - mousePointTo.x * newScale,
-          //   y: e.y - mousePointTo.y * newScale,
-          // };
           this.gc.x -= (this.gc.width - oldWidth) / 2;
           this.gc.y -= (this.gc.height - oldHeight) / 2;
         }
-
-        this.drawRectList();
       }
     },
 

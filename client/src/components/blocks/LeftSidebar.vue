@@ -41,7 +41,7 @@
 
         <div
           class="colors-selected"
-          :style="{ background: getSelectedColor }"
+          :style="{ background: selectedColor }"
         ></div>
       </div>
 
@@ -53,13 +53,44 @@
         </div>
         <div class="color-list">
           <div
-            v-for="(item, i) in getColorPallete"
+            v-for="(item, i) in colorPallete"
             :key="i"
-            :class="['color-item', item === getSelectedColor ? '_active' : '']"
+            :class="['color-item', item === selectedColor ? '_active' : '']"
             :style="{ background: item }"
             @click="chooseColorInPallete(item)"
           ></div>
         </div>
+      </div>
+
+      <hr />
+      <div class="choose-size">
+        <div class="__title">Выбрать размер</div>
+        <select v-model="sizePaint">
+          <option
+            v-for="(val, name) in defaultSizesPaint"
+            :key="name"
+            :value="name"
+            :disabled="name == 'custom'"
+          >
+            {{ getTextSizePaint(val) }}
+          </option>
+        </select>
+        <button @click="chooseSize" :disabled="sizePaint == 'custom'">
+          OK
+        </button>
+      </div>
+
+      <hr />
+      <div class="choose-size">
+        <div class="__title">Задать свой размер</div>
+        <label for=""
+          >Ширина: <input v-model="customSizePaint.cols" type="text"
+        /></label>
+        <label for=""
+          >Высота: <input v-model="customSizePaint.rows" type="text"
+        /></label>
+        <button @click="chooseCustomSize">ОК</button>
+        <div class="__title">Не может превышать 800x600</div>
       </div>
     </div>
   </div>
@@ -77,8 +108,28 @@ export default {
     ColorPicker,
   },
 
+  data() {
+    return {
+      sizePaint: "",
+      customSizePaint: {
+        cols: "",
+        rows: "",
+      },
+    };
+  },
+
+  mounted() {
+    this.sizePaint = this.selectedSizePaint.name;
+  },
+
   computed: {
-    ...mapGetters(["getSelectedColor", "getColorPallete"]),
+    ...mapGetters([
+      "selectedColor",
+      "colorPallete",
+      "getSizePaint",
+      "selectedSizePaint",
+      "defaultSizesPaint",
+    ]),
   },
 
   methods: {
@@ -88,11 +139,25 @@ export default {
 
     chooseColor() {},
     addColorInPollete() {
-      this.$store.dispatch("addColorInPallete", this.getSelectedColor);
+      this.$store.dispatch("addColorInPallete", this.selectedColor);
     },
 
     chooseColorInPallete(color) {
       this.$store.dispatch("setSelectedColor", color);
+    },
+
+    chooseSize() {
+      this.$store.dispatch("setSizePaint", this.sizePaint);
+    },
+
+    chooseCustomSize() {
+      console.log(this.customSizePaint, this.sizePaint);
+      this.$store.dispatch("setCustomSizePaint", this.customSizePaint);
+      this.sizePaint = "custom";
+    },
+
+    getTextSizePaint(value) {
+      return typeof value === "string" ? value : `${value[0]}x${value[1]}`;
     },
   },
 };
