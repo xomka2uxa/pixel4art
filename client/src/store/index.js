@@ -13,6 +13,8 @@ export default createStore({
       lg: [100, 100],
       custom: "Свои размеры",
     },
+    rectList: [],
+    isCanvasClean: false,
   },
   getters: {
     selectedColor(state) {
@@ -30,6 +32,14 @@ export default createStore({
     defaultSizesPaint(state) {
       return state.defaultSizesPaint;
     },
+
+    rectList(state) {
+      return state.rectList;
+    },
+
+    isCanvasClean(state) {
+      return state.isCanvasClean;
+    },
   },
   mutations: {
     setSelectedColor(state, color) {
@@ -40,6 +50,13 @@ export default createStore({
       if (!state.colorPallete.includes(color)) {
         state.colorPallete.push(color);
       }
+    },
+
+    removeColorInPallete(state, color) {
+      state.colorPallete = state.colorPallete.filter((c) => c !== color);
+      state.selectedColor = state.colorPallete.length
+        ? state.colorPallete[0]
+        : "rgb(255, 136, 0)";
     },
 
     setSizePaint(state, size) {
@@ -55,6 +72,14 @@ export default createStore({
         value: [+size.cols, +size.rows],
       };
     },
+
+    setRectList(state, list) {
+      state.rectList = list;
+    },
+
+    setCanvasClean(state, flag) {
+      state.isCanvasClean = flag;
+    },
   },
   actions: {
     setSelectedColor({ commit }, color) {
@@ -65,12 +90,24 @@ export default createStore({
       commit("addColorInPallete", color);
     },
 
+    removeColorInPallete({ commit }, color) {
+      commit("removeColorInPallete", color);
+    },
+
     setSizePaint({ commit }, size) {
       commit("setSizePaint", size);
     },
 
     setCustomSizePaint({ commit }, size) {
       commit("setCustomSizePaint", size);
+    },
+
+    setRectList({ commit }, list) {
+      commit("setRectList", list);
+    },
+
+    setCanvasClean({ commit }, flag) {
+      commit("setCanvasClean", flag);
     },
   },
   modules: {},

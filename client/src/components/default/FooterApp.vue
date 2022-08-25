@@ -2,10 +2,7 @@
   <div class="footer">
     <div class="container">
       <div class="logo">
-        <a href="index.html">
-          <img src="" alt="PIX4ART" />
-          PIX4ART
-        </a>
+        <a href="index.html"> PIX4ART </a>
       </div>
       <div class="copyright">
         <span>Pix4art@copyright 2022</span>
@@ -22,15 +19,24 @@ export default {
 
 <style lang="scss" scoped>
 .footer {
-  position: relative;
-  background-color: black;
-  color: aliceblue;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgb(179 79 148);
+  color: #fff;
   padding: 15px 0;
   z-index: 5;
+  display: none;
+
+  a {
+    color: #fff;
+  }
 
   .container {
     display: flex;
     justify-content: space-between;
+    align-items: center;
   }
 }
 </style>

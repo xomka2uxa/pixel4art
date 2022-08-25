@@ -57,7 +57,6 @@ export default {
         x: 0,
         y: 0,
       },
-
       rectList: [],
       isClick: false,
       isDragging: true,
@@ -85,10 +84,18 @@ export default {
       },
       deep: true,
     },
+
+    "$store.state.isCanvasClean": function (val) {
+      if (val) {
+        this.rectList = [];
+        this.changeSizeCanvas();
+        this.$store.dispatch("setCanvasClean", false);
+      }
+    },
   },
 
   computed: {
-    ...mapGetters(["selectedColor", "selectedSizePaint"]),
+    ...mapGetters(["selectedColor", "selectedSizePaint", "isCanvasClean"]),
   },
 
   methods: {
@@ -131,8 +138,9 @@ export default {
     },
 
     drawGroup() {
-      this.ctx.strokeStyle = "rgba(0, 0, 0, 1)";
-      this.ctx.strokeRect(this.gc.x, this.gc.y, this.gc.width, this.gc.height);
+      this.ctx.fillStyle = "rgba(255, 255, 255, 1)";
+      this.ctx.rect(this.gc.x, this.gc.y, this.gc.width, this.gc.height);
+      this.ctx.fill();
     },
 
     drawLines() {
@@ -194,6 +202,7 @@ export default {
         row: shiftRectY,
         color,
       });
+
       this.ctx.fillRect(
         this.gc.x + shiftRectX * (this.cc.squareSize * this.cc.scale),
         this.gc.y + shiftRectY * (this.cc.squareSize * this.cc.scale),
@@ -243,6 +252,8 @@ export default {
         if (e.type === "mouseup") {
           this.cc.isClick = false;
           this.timeoutDragStop();
+          console.log(this.isDragging, 333);
+          // this.drawRect(e);
           this.isDragging = true;
         }
       } else {
@@ -333,5 +344,6 @@ export default {
 .container-canvas {
   width: 100%;
   height: 100vh;
+  background: rgb(230, 230, 230);
 }
 </style>

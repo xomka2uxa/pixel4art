@@ -1,0 +1,33 @@
+@import "./default.scss";
+@import "./grid.scss";
+@import "./spacing.scss";
+
+.btn {
+  outline: none;
+  border: none;
+  background: #e0e0e0;
+  padding: 5px 10px;
+  border-radius: 10px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  &._circle {
+    border-radius: 50%;
+    padding: 5px;
+  }
+
+  &._no-padding {
+    padding: 0;
+  }
+}
+
+.mdi {
+  svg {
+    fill: #333;
+    width: 24px;
+    height: 24px;
+  }
+}

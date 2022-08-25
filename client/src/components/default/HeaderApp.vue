@@ -1,12 +1,9 @@
 <template>
   <div class="header">
-    <div class="container">
+    <div class="container --fluid">
       <div class="header__inner">
         <div class="logo">
-          <a href="index.html">
-            <img src="" alt="PIX4ART" />
-            PIX4ARTSSS
-          </a>
+          <a href="index.html"> PIX4ART </a>
         </div>
         <div class="header__nav">
           <ul>
@@ -30,9 +27,17 @@ export default {
 
 <style lang="scss" scoped>
 .header {
-  position: relative;
-  background-color: beige;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: rgb(179 79 148);
   z-index: 5;
+  color: #fff;
+
+  a {
+    color: #fff;
+  }
 
   &__inner {
     display: flex;
@@ -52,13 +57,6 @@ export default {
 
       &:last-child {
         margin-right: 0;
-      }
-    }
-
-    .active {
-      a {
-        color: rgb(62, 62, 62);
-        background-color: rgb(165, 172, 109);
       }
     }
   }
