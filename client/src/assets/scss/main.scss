@@ -14,12 +14,12 @@
   justify-content: center;
   cursor: pointer;
 
-  &._circle {
+  &.--circle {
     border-radius: 50%;
     padding: 5px;
   }
 
-  &._no-padding {
+  &.--no-padding {
     padding: 0;
   }
 }
