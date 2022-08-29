@@ -1,6 +1,6 @@
 <template>
   <div class="control-canvas">
-    <div class="btn _circle" title="Очистить холст">
+    <div class="btn --circle" title="Очистить холст">
       <clear-canvas />
     </div>
   </div>
@@ -35,12 +35,12 @@ export default {
   justify-content: center;
   cursor: pointer;
 
-  &._circle {
+  &.--circle {
     border-radius: 50%;
     padding: 5px;
   }
 
-  &._no-padding {
+  &.--no-padding {
     padding: 0;
   }
 }

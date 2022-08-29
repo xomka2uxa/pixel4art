@@ -5,7 +5,7 @@
         <div class="row mx--5">
           <div class="col px-5">
             <button
-              class="btn _circle"
+              class="btn --circle"
               title="Очистить холст"
               @click="makeCanvasCleanModal"
             >
@@ -37,12 +37,12 @@
             </vue-final-modal>
           </div>
           <div class="col px-5 ml-auto">
-            <button class="btn _circle" title="Отменить последнее действие">
+            <button class="btn --circle" title="Отменить последнее действие">
               <mdicon name="arrow-u-left-top" class="my-mdi" />
             </button>
           </div>
           <div class="col px-5">
-            <button class="btn _circle" title="Вернуть последнее действие">
+            <button class="btn --circle" title="Вернуть последнее действие">
               <mdicon name="arrow-u-right-top" class="my-mdi" />
             </button>
           </div>
@@ -53,7 +53,7 @@
           Выбрать цвет:
           <Popper>
             <button
-              class="btn _circle"
+              class="btn --circle"
               :style="{ background: selectedColor }"
               title="Выбрать цвет"
             >
@@ -100,14 +100,14 @@
         <div class="__header">
           <div class="__title">Палитра</div>
           <button
-            class="__btn __btn--add btn _circle _no-padding"
+            class="__btn __btn--add btn --circle --no-padding"
             title="Добавить в палитру цвет"
             @click="addColorInPollete"
           >
             <mdicon name="eyedropper-variant" class="my-mdi" />
           </button>
           <button
-            class="__btn btn _circle _no-padding"
+            class="__btn btn --circle --no-padding"
             title="Удалить из палитры увет"
             @click="removeColorInPollete"
           >
