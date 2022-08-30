@@ -31,3 +31,18 @@
     height: 24px;
   }
 }
+
+.preheader-mdi {
+  opacity: 0.2;
+  transition-duration: .5s;
+
+  svg {
+    fill: #fff;
+    width: 20px;
+    height: 20px;
+  }
+
+  &:hover {
+    opacity: 0.4;
+  }
+}

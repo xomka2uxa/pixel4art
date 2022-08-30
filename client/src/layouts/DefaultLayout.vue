@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import HeaderApp from "@/components/default/Header/HeaderApp.vue";
+import HeaderApp from "@/components/default/header-app/HeaderApp.vue";
 import FooterApp from "@/components/default/FooterApp.vue";
 
 export default {
