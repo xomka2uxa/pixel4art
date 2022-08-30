@@ -37,12 +37,22 @@
             </vue-final-modal>
           </div>
           <div class="col px-5 ml-auto">
-            <button class="btn --circle" title="Отменить последнее действие">
+            <button
+              class="btn --circle"
+              title="Отменить последнее действие"
+              :disabled="cntHistoryAction >= 5"
+              @click="undoLastAction"
+            >
               <mdicon name="arrow-u-left-top" class="my-mdi" />
             </button>
           </div>
           <div class="col px-5">
-            <button class="btn --circle" title="Вернуть последнее действие">
+            <button
+              class="btn --circle"
+              title="Вернуть последнее действие"
+              :disabled="cntHistoryAction <= 0"
+              @click="returnFromHistoryList"
+            >
               <mdicon name="arrow-u-right-top" class="my-mdi" />
             </button>
           </div>
@@ -190,6 +200,7 @@ export default {
       "getSizePaint",
       "selectedSizePaint",
       "defaultSizesPaint",
+      "cntHistoryAction",
     ]),
   },
 
@@ -231,6 +242,15 @@ export default {
     makeCanvasClean() {
       this.$store.dispatch("setCanvasClean", true);
       this.showModal = false;
+    },
+
+    undoLastAction() {
+      this.$store.dispatch("undoLastAction", true);
+      this.$store.dispatch("setHistoryMode", true);
+    },
+
+    returnFromHistoryList() {
+      this.$store.dispatch("returnFromHistoryList", true);
     },
   },
 };
