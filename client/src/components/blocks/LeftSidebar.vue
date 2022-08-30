@@ -2,7 +2,7 @@
   <div class="left-sidebar">
     <div class="__inner">
       <div class="__box control-btn">
-        <div class="row mx--5">
+        <div class="row mx-5">
           <div class="col px-5">
             <button
               class="btn --circle"
@@ -59,50 +59,63 @@
         </div>
       </div>
       <div class="__box choose-color">
-        <div class="__header">
-          Выбрать цвет:
-          <Popper>
-            <button
-              class="btn --circle"
-              :style="{ background: selectedColor }"
-              title="Выбрать цвет"
-            >
-              <mdicon name="format-color-fill" class="my-mdi" />
-            </button>
-            <template #content>
-              <div class="color-picker">
-                <ColorPicker
-                  color="#f80b"
-                  default-format="rgb"
-                  :visible-formats="['hex']"
-                  alpha-channel="hide"
-                  @color-change="updateColor"
-                >
-                  <template #copy-button>
-                    <div>
-                      <svg
-                        aria-hidden="true"
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="15"
-                        height="15"
-                        viewBox="0 0 15 15"
-                      >
-                        <path
-                          d="M5 0v2H1v13h12v-3h-1v2H2V5h10v3h1V2H9V0zm1 1h2v2h3v1H3V3h3z"
-                          fill="currentColor"
-                        />
+        <div class="scaling">
+          <button class="btn --circle" title="Меньше" @click="doScaling(-1)">
+            <mdicon name="minus" class="my-mdi" />
+          </button>
+          <span>{{ scaleInPrc }}%</span>
+          <button class="btn --circle" title="Больше" @click="doScaling(1)">
+            <mdicon name="plus" class="my-mdi" />
+          </button>
+        </div>
+      </div>
+      <div class="__box choose-color">
+        <div class="row mx-5 align-center">
+          <div class="col px-5">Выбрать цвет:</div>
+          <div class="col px-5 ml-auto">
+            <Popper>
+              <button
+                class="btn --circle"
+                :style="{ background: selectedColor }"
+                title="Выбрать цвет"
+              >
+                <mdicon name="format-color-fill" class="my-mdi" />
+              </button>
+              <template #content>
+                <div class="color-picker">
+                  <ColorPicker
+                    color="#f80b"
+                    default-format="rgb"
+                    :visible-formats="['hex']"
+                    alpha-channel="hide"
+                    @color-change="updateColor"
+                  >
+                    <template #copy-button>
+                      <div>
+                        <svg
+                          aria-hidden="true"
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="15"
+                          height="15"
+                          viewBox="0 0 15 15"
+                        >
+                          <path
+                            d="M5 0v2H1v13h12v-3h-1v2H2V5h10v3h1V2H9V0zm1 1h2v2h3v1H3V3h3z"
+                            fill="currentColor"
+                          />
 
-                        <path
-                          d="M10 7v2h5v2h-5v2l-3-3zM3 6h5v1H3zm0 2h3v1H3zm0 2h3v1H3zm0 2h5v1H3z"
-                          fill="currentColor"
-                        />
-                      </svg>
-                    </div>
-                  </template>
-                </ColorPicker>
-              </div>
-            </template>
-          </Popper>
+                          <path
+                            d="M10 7v2h5v2h-5v2l-3-3zM3 6h5v1H3zm0 2h3v1H3zm0 2h3v1H3zm0 2h5v1H3z"
+                            fill="currentColor"
+                          />
+                        </svg>
+                      </div>
+                    </template>
+                  </ColorPicker>
+                </div>
+              </template>
+            </Popper>
+          </div>
         </div>
       </div>
 
@@ -178,6 +191,10 @@ export default {
     ColorPicker,
   },
 
+  props: ["scaleInPrc"],
+
+  emits: ["doScaling"],
+
   data() {
     return {
       sizePaint: "",
@@ -251,6 +268,10 @@ export default {
 
     returnFromHistoryList() {
       this.$store.dispatch("returnFromHistoryList", true);
+    },
+
+    doScaling(direction) {
+      this.$emit("doScaling", direction);
     },
   },
 };
@@ -328,6 +349,16 @@ export default {
 .choose-size {
   input {
     width: 100%;
+  }
+}
+
+.scaling {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+
+  & > span {
+    margin: 0 10px;
   }
 }
 </style>

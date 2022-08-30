@@ -102,7 +102,6 @@ export default createStore({
     },
 
     setCntHistoryAction(state, flag) {
-      console.log(flag, 888);
       if (flag === null) {
         state.cntHistoryAction = 0;
       } else {
