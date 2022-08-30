@@ -28,6 +28,13 @@ import LeftSidebar from "@/components/blocks/LeftSidebar.vue";
 5. убрать ошибку PCanvas2.vue?439a:92 Uncaught TypeError: Cannot read properties of null (reading 'offsetWidth')
 6. при выходе мыши за канвас если рисовали то надо продолжать рисовать если перемещали то продолжать перемещать
 */
+
+/*
+  мне надо:
+  - потом вырезать последний массив из рект листа и писать в историю
+  - если появился новый нарисованный элемент то удаляем историю и обнуляем хистори коунт
+
+*/
 export default {
   components: {
     LeftSidebar,
@@ -61,6 +68,8 @@ export default {
       isClick: false,
       isDragging: true,
       timer: null,
+      beginMovePaint: false,
+      rectListHistory: [],
     };
   },
 
@@ -92,10 +101,40 @@ export default {
         this.$store.dispatch("setCanvasClean", false);
       }
     },
+
+    "$store.state.isUndoLastAction": function (val) {
+      if (val && this.cntHistoryAction < 5) {
+        if (this.rectList.length) {
+          this.$store.dispatch("setCntHistoryAction", true);
+          this.rectListHistory.push(this.rectList.at(-1));
+          this.rectList.pop();
+        }
+        console.log(this.rectListHistory, 999);
+        this.$store.dispatch("undoLastAction", false);
+      }
+    },
+
+    "$store.state.isReturnFromHistoryList": function (val) {
+      if (val && this.cntHistoryAction >= 0) {
+        if (this.rectListHistory.length) {
+          this.$store.dispatch("setCntHistoryAction", false);
+          this.rectList.push(this.rectListHistory.at(-1));
+          this.rectListHistory.pop();
+        }
+
+        this.$store.dispatch("returnFromHistoryList", false);
+      }
+    },
   },
 
   computed: {
-    ...mapGetters(["selectedColor", "selectedSizePaint", "isCanvasClean"]),
+    ...mapGetters([
+      "selectedColor",
+      "selectedSizePaint",
+      "isCanvasClean",
+      "cntHistoryAction",
+      "historyMode",
+    ]),
   },
 
   methods: {
@@ -175,19 +214,26 @@ export default {
     drawRectList() {
       this.ctx.fillStyle = "red";
       for (let i = 0; i < this.rectList.length; i++) {
-        this.ctx.fillStyle = this.rectList[i].color;
-        this.ctx.fillRect(
-          this.gc.x +
-            this.rectList[i].col * (this.cc.squareSize * this.cc.scale),
-          this.gc.y +
-            this.rectList[i].row * (this.cc.squareSize * this.cc.scale),
-          this.cc.squareSize * this.cc.scale,
-          this.cc.squareSize * this.cc.scale
-        );
+        for (let j = 0; j < this.rectList[i].length; j++) {
+          this.ctx.fillStyle = this.rectList[i][j].color;
+          this.ctx.fillRect(
+            this.gc.x +
+              this.rectList[i][j].col * (this.cc.squareSize * this.cc.scale),
+            this.gc.y +
+              this.rectList[i][j].row * (this.cc.squareSize * this.cc.scale),
+            this.cc.squareSize * this.cc.scale,
+            this.cc.squareSize * this.cc.scale
+          );
+        }
       }
     },
 
     drawRect(e) {
+      if (this.historyMode) {
+        this.rectListHistory = [];
+        this.$store.dispatch("setHistoryMode", false);
+        this.$store.dispatch("setCntHistoryAction", null);
+      }
       const shiftX = e.offsetX - this.gc.x;
       const realSquareSizeX = this.gc.width / this.cc.cols;
       const shiftRectX = Math.floor(shiftX / realSquareSizeX);
@@ -197,11 +243,33 @@ export default {
       const shiftRectY = Math.floor(shiftY / realSquareSizeY);
       const color = this.selectedColor;
       this.ctx.fillStyle = color;
-      this.rectList.push({
+      let isRectUnique = true;
+      const newColor = {
         col: shiftRectX,
         row: shiftRectY,
         color,
-      });
+      };
+
+      for (let i = 0; i < this.rectList.length; i++) {
+        for (let j = 0; j < this.rectList[i].length; j++) {
+          if (JSON.stringify(this.rectList[i][j]) == JSON.stringify(newColor)) {
+            isRectUnique = false;
+          }
+        }
+      }
+
+      if (isRectUnique) {
+        if (!this.beginMovePaint) {
+          this.rectList.push([newColor]);
+        }
+        this.rectList.at(-1).push(newColor);
+      }
+
+      /*
+       как сделать чтобы после первого элемента при перетаскивании
+       я не создавал новый массив
+       задавать переменную которая говорит что это начала рисования многих элементов
+      */
 
       this.ctx.fillRect(
         this.gc.x + shiftRectX * (this.cc.squareSize * this.cc.scale),
@@ -246,20 +314,21 @@ export default {
             this.gc.y = e.offsetY - this.cc.shiftY;
           } else {
             this.drawRect(e);
+            if (!this.beginMovePaint) this.beginMovePaint = true;
           }
         }
 
         if (e.type === "mouseup") {
           this.cc.isClick = false;
           this.timeoutDragStop();
-          console.log(this.isDragging, 333);
-          // this.drawRect(e);
           this.isDragging = true;
+          this.beginMovePaint = false;
         }
       } else {
         this.cc.isClick = false;
         this.timeoutDragStop();
         this.isDragging = true;
+        this.beginMovePaint = false;
       }
     },
 
@@ -315,6 +384,8 @@ export default {
     timeoutDragStart(e) {
       const isDrag = () => {
         this.isDragging = false;
+
+        console.log(this.rectList);
         this.drawRect(e);
       };
 

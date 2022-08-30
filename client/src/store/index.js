@@ -15,6 +15,10 @@ export default createStore({
     },
     rectList: [],
     isCanvasClean: false,
+    isUndoLastAction: false,
+    isReturnFromHistoryList: false,
+    cntHistoryAction: 0,
+    historyMode: false,
   },
   getters: {
     selectedColor(state) {
@@ -39,6 +43,14 @@ export default createStore({
 
     isCanvasClean(state) {
       return state.isCanvasClean;
+    },
+
+    cntHistoryAction(state) {
+      return state.cntHistoryAction;
+    },
+
+    historyMode(state) {
+      return state.historyMode;
     },
   },
   mutations: {
@@ -80,6 +92,31 @@ export default createStore({
     setCanvasClean(state, flag) {
       state.isCanvasClean = flag;
     },
+
+    undoLastAction(state, flag) {
+      state.isUndoLastAction = flag;
+    },
+
+    returnFromHistoryList(state, flag) {
+      state.isReturnFromHistoryList = flag;
+    },
+
+    setCntHistoryAction(state, flag) {
+      console.log(flag, 888);
+      if (flag === null) {
+        state.cntHistoryAction = 0;
+      } else {
+        if (flag) {
+          state.cntHistoryAction += state.cntHistoryAction < 5 ? 1 : 0;
+        } else {
+          state.cntHistoryAction -= state.cntHistoryAction >= 0 ? 1 : 0;
+        }
+      }
+    },
+
+    setHistoryMode(state, flag) {
+      state.historyMode = flag;
+    },
   },
   actions: {
     setSelectedColor({ commit }, color) {
@@ -109,6 +146,23 @@ export default createStore({
     setCanvasClean({ commit }, flag) {
       commit("setCanvasClean", flag);
     },
+
+    undoLastAction({ commit }, flag) {
+      commit("undoLastAction", flag);
+    },
+
+    returnFromHistoryList({ commit }, flag) {
+      commit("returnFromHistoryList", flag);
+    },
+
+    setCntHistoryAction({ commit }, flag) {
+      commit("setCntHistoryAction", flag);
+    },
+
+    setHistoryMode({ commit }, flag) {
+      commit("setHistoryMode", flag);
+    },
   },
+
   modules: {},
 });
