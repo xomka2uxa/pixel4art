@@ -1,18 +1,15 @@
 <template>
   <div class="main">
-    <header-open />
     <app-canvas />
   </div>
 </template>
 
 <script>
 import AppCanvas from "@/components/blocks/AppCanvas.vue";
-import HeaderOpen from "@/components/default/header-app/HeaderOpen.vue";
 
 export default {
   components: {
     AppCanvas,
-    HeaderOpen,
   },
 
   data() {

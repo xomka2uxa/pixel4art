@@ -6,20 +6,27 @@
       isHeaderHidden ? 'hide' : '',
     ]"
   >
-    <preheader-app />
-    <div class="header-bottom">
-      <div class="container --fluid">
-        <div class="header__inner">
-          <header-logo />
-          <header-burger @open="openMenuToggle" />
-          <header-nav-wrapper
-            :is-open-menu="isOpenMenu"
-            @close="openMenuToggle"
-            @set-header-toggle="swopeHeaderToggle"
-          />
+    <div class="__inner">
+      <preheader-app />
+      <div class="header-bottom">
+        <div class="container --fluid">
+          <div class="header__inner">
+            <header-logo />
+            <header-burger @open="openMenuToggle" />
+            <header-nav-wrapper
+              :is-open-menu="isOpenMenu"
+              @close="openMenuToggle"
+              @set-header-toggle="swopeHeaderToggle"
+            />
+          </div>
         </div>
       </div>
     </div>
+    <header-open
+      class="__open-btn"
+      :is-header-hidden="isHeaderHidden"
+      @click="swopeHeaderToggle"
+    />
   </div>
 </template>
 
@@ -30,6 +37,7 @@ import PreheaderApp from "@/components/default/header-app/PreheaderApp.vue";
 import HeaderLogo from "@/components/default/header-app/HeaderLogo.vue";
 import HeaderBurger from "@/components/default/header-app/HeaderBurger.vue";
 import HeaderNavWrapper from "@/components/default/header-app/HeaderNavWrapper.vue";
+import HeaderOpen from "@/components/default/header-app/HeaderOpen.vue";
 
 export default {
   data() {
@@ -44,6 +52,7 @@ export default {
     HeaderBurger,
     HeaderNavWrapper,
     PreheaderApp,
+    HeaderOpen,
   },
 
   computed: {
@@ -68,10 +77,18 @@ export default {
   top: 0;
   left: 0;
   right: 0;
-  background-color: $bg-header;
   color: #fff;
   z-index: 5;
-  transition: 0.4s;
+
+  .__inner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: $bg-header;
+    transition: transform 0.4s;
+    z-index: 2;
+  }
 
   a {
     color: #fff;
@@ -101,11 +118,17 @@ export default {
 }
 
 .transparent {
-  background: none;
+  .__inner {
+    background-color: transparent;
+  }
 }
+
 .hide {
-  transform: translateY(-115px);
+  .__inner {
+    transform: translateY(-115px);
+  }
 }
+
 .header-bottom {
   display: block;
 }
