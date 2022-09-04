@@ -10,7 +10,7 @@
         @mousemove="handleCanvasEvent"
       ></canvas>
     </div>
-    <left-sidebar />
+    <left-sidebar :scale-in-prc="scaleInPrc" @do-scaling="doScaling" />
   </div>
 </template>
 
@@ -24,16 +24,15 @@ import LeftSidebar from "@/components/blocks/LeftSidebar.vue";
 1. ограничить вылезание за эран при перемещении и масштабировании
 2. сделать более плавным перемещение и масштабирование
 3. закрашивать промежуточные квадраты при закрашивании
-4. если в массиве такой квадрат уже есть то заменять его
-5. убрать ошибку PCanvas2.vue?439a:92 Uncaught TypeError: Cannot read properties of null (reading 'offsetWidth')
-6. при выходе мыши за канвас если рисовали то надо продолжать рисовать если перемещали то продолжать перемещать
-*/
-
-/*
-  мне надо:
-  - потом вырезать последний массив из рект листа и писать в историю
-  - если появился новый нарисованный элемент то удаляем историю и обнуляем хистори коунт
-
+4. В массив добавляется два квадрата одинаковых
+5. В массиве не заменяется квадрат на том же месте а просто добавляется
+6. Очищать историю при очищении всего канваса
+7. убрать ошибку PCanvas2.vue?439a:92 Uncaught TypeError: Cannot read properties of null (reading 'offsetWidth')
+8. при выходе мыши за канвас если рисовали то надо продолжать рисовать если перемещали то продолжать перемещать
+9. Переписать события из саййдбара без стора
+10. Двигать по целым пикселям при масштабировании
+11. При перемещении ставить тоже в целые пиксели когда отпускаем мышь
+12. попробовать переводить в рисунок часть картинки
 */
 export default {
   components: {
@@ -70,6 +69,7 @@ export default {
       timer: null,
       beginMovePaint: false,
       rectListHistory: [],
+      scaleInPrc: "",
     };
   },
 
@@ -174,6 +174,11 @@ export default {
       this.gc.height = this.cc.rows * this.cc.squareSize * this.cc.scale;
       this.gc.x = this.cc.width / 2 - this.gc.width / 2;
       this.gc.y = this.cc.height / 2 - this.gc.height / 2;
+
+      this.scaleInPrc = Math.floor(
+        ((this.cc.squareSize * this.cc.scale) / this.cc.squareSize) * 100
+      );
+      console.log(this.scaleInPrc, 222);
     },
 
     drawGroup() {
@@ -335,49 +340,57 @@ export default {
     handleMouseWheel(e) {
       if (this.isAreaGroup(e)) {
         e.preventDefault();
-        const container = this.$refs.containerCanvas;
         const direction = e.deltaY > 0 ? -1 : 1;
+        this.setNewScale(direction);
+      }
+    },
 
-        const oldScale = this.cc.scale;
-        const newScale =
-          direction > 0
-            ? oldScale * this.cc.scaleBy
-            : oldScale / this.cc.scaleBy;
+    doScaling(direction) {
+      this.setNewScale(direction);
+    },
 
-        const isCanScaleByUp =
-          this.gc.width / this.cc.cols < this.cc.squareSize * 2;
-        const diffX = container.offsetWidth - this.gc.width;
-        const diffY = container.offsetHeight - this.gc.height;
+    setNewScale(direction) {
+      const container = this.$refs.containerCanvas;
+      const oldScale = this.cc.scale;
+      const newScale =
+        direction > 0 ? oldScale * this.cc.scaleBy : oldScale / this.cc.scaleBy;
 
-        let isCanScaleByDown = null;
-        if (
-          this.cc.cols * this.cc.squareSize < container.offsetWidth &&
-          this.cc.rows * this.cc.squareSize < container.offsetHeight
-        ) {
-          isCanScaleByDown =
-            diffX < diffY
-              ? this.gc.width > this.cc.cols * this.cc.squareSize
-              : this.gc.height > this.cc.rows * this.cc.squareSize;
-        } else {
-          isCanScaleByDown =
-            diffX < diffY
-              ? this.gc.width > container.offsetWidth * 0.9
-              : this.gc.height > container.offsetHeight * 0.9;
-        }
+      const isCanScaleByUp =
+        this.gc.width / this.cc.cols < this.cc.squareSize * 2;
+      const diffX = container.offsetWidth - this.gc.width;
+      const diffY = container.offsetHeight - this.gc.height;
 
-        if (
-          (direction > 0 && isCanScaleByUp) ||
-          (direction < 0 && isCanScaleByDown)
-        ) {
-          this.cc.scale = newScale;
-          const oldWidth = this.gc.width;
-          const oldHeight = this.gc.height;
-          this.gc.width = this.cc.cols * this.cc.squareSize * this.cc.scale;
-          this.gc.height = this.cc.rows * this.cc.squareSize * this.cc.scale;
+      let isCanScaleByDown = null;
+      if (
+        this.cc.cols * this.cc.squareSize < container.offsetWidth &&
+        this.cc.rows * this.cc.squareSize < container.offsetHeight
+      ) {
+        isCanScaleByDown =
+          diffX < diffY
+            ? this.gc.width > this.cc.cols * this.cc.squareSize
+            : this.gc.height > this.cc.rows * this.cc.squareSize;
+      } else {
+        isCanScaleByDown =
+          diffX < diffY
+            ? this.gc.width > container.offsetWidth * 0.9
+            : this.gc.height > container.offsetHeight * 0.9;
+      }
 
-          this.gc.x -= (this.gc.width - oldWidth) / 2;
-          this.gc.y -= (this.gc.height - oldHeight) / 2;
-        }
+      if (
+        (direction > 0 && isCanScaleByUp) ||
+        (direction < 0 && isCanScaleByDown)
+      ) {
+        this.cc.scale = newScale;
+        const oldWidth = this.gc.width;
+        const oldHeight = this.gc.height;
+        this.gc.width = this.cc.cols * this.cc.squareSize * this.cc.scale;
+        this.gc.height = this.cc.rows * this.cc.squareSize * this.cc.scale;
+        this.scaleInPrc = Math.floor(
+          ((this.cc.squareSize * this.cc.scale) / this.cc.squareSize) * 100
+        );
+        console.log(this.scaleInPrc, 555);
+        this.gc.x -= (this.gc.width - oldWidth) / 2;
+        this.gc.y -= (this.gc.height - oldHeight) / 2;
       }
     },
 
