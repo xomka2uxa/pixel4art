@@ -1,7 +1,13 @@
 <template>
-  <div class="header-wrapper">
+  <div
+    class="header"
+    :class="[
+      isHeaderTransparent ? 'transparent' : '',
+      isHeaderHidden ? 'hide' : '',
+    ]"
+  >
     <preheader-app />
-    <div class="header">
+    <div class="header-bottom">
       <div class="container --fluid">
         <div class="header__inner">
           <header-logo />
@@ -9,6 +15,7 @@
           <header-nav-wrapper
             :is-open-menu="isOpenMenu"
             @close="openMenuToggle"
+            @set-header-toggle="swopeHeaderToggle"
           />
         </div>
       </div>
@@ -17,17 +24,18 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
+
 import PreheaderApp from "@/components/default/header-app/PreheaderApp.vue";
 import HeaderLogo from "@/components/default/header-app/HeaderLogo.vue";
 import HeaderBurger from "@/components/default/header-app/HeaderBurger.vue";
 import HeaderNavWrapper from "@/components/default/header-app/HeaderNavWrapper.vue";
 
 export default {
-  name: "HeaderApp",
-
   data() {
     return {
       isOpenMenu: false,
+      isHeaderHidden: false,
     };
   },
 
@@ -38,9 +46,17 @@ export default {
     PreheaderApp,
   },
 
+  computed: {
+    ...mapGetters(["isHeaderTransparent"]),
+  },
+
   methods: {
     openMenuToggle() {
       this.isOpenMenu = !this.isOpenMenu;
+    },
+
+    swopeHeaderToggle() {
+      this.isHeaderHidden = !this.isHeaderHidden;
     },
   },
 };
@@ -49,12 +65,13 @@ export default {
 <style lang="scss" scoped>
 .header {
   position: absolute;
-  top: 40px;
+  top: 0;
   left: 0;
   right: 0;
-  z-index: 5;
   background-color: $bg-header;
   color: #fff;
+  z-index: 5;
+  transition: 0.4s;
 
   a {
     color: #fff;
@@ -81,5 +98,15 @@ export default {
       }
     }
   }
+}
+
+.transparent {
+  background: none;
+}
+.hide {
+  transform: translateY(-115px);
+}
+.header-bottom {
+  display: block;
 }
 </style>

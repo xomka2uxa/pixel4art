@@ -6,11 +6,11 @@
         :key="i"
         :class="item.subLinks ? 'nested_link' : ''"
       >
-        <a :href="item.link">{{ item.title }}</a>
+        <router-link :to="item.link">{{ item.title }}</router-link>
         <div v-if="item.subLinks" class="nested_nav__wrapper">
           <ul class="nested_nav">
             <li v-for="(subItem, i) in item.subLinks" :key="i">
-              <a :href="subItem.link">{{ subItem.title }}</a>
+              <router-link :to="subItem.link">{{ subItem.title }}</router-link>
             </li>
           </ul>
         </div>
@@ -26,81 +26,81 @@ export default {
       routeList: [
         {
           title: "Главная",
-          link: "#",
+          link: "/",
           subLinks: null,
         },
         {
-          title: "О проекте",
-          link: "#",
-          subLinks: [
-            {
-              title: "Возможности",
-              link: "#",
-            },
-            {
-              title: "Обучение",
-              link: "#",
-            },
-            {
-              title: "Тарифы",
-              link: "#",
-            },
-            {
-              title: "Контакты",
-              link: "#",
-            },
-          ],
+          title: "Свободное рисование",
+          link: "/free-paint",
+          // subLinks: [
+          //   {
+          //     title: "Возможности",
+          //     link: "#",
+          //   },
+          //   {
+          //     title: "Обучение",
+          //     link: "#",
+          //   },
+          //   {
+          //     title: "Тарифы",
+          //     link: "#",
+          //   },
+          //   {
+          //     title: "Контакты",
+          //     link: "#",
+          //   },
+          // ],
         },
-        {
-          title: "Рисование",
-          link: "#",
-          subLinks: null,
-        },
-        {
-          title: "Раскраски",
-          link: "#",
-          subLinks: [
-            {
-              title: "Фиксированная палитра",
-              link: "#",
-            },
-            {
-              title: "Свободная палитра",
-              link: "/free-paint",
-            },
-            {
-              title: "Каталог раскрасок",
-              link: "#",
-            },
-          ],
-        },
+        // {
+        //   title: "Рисование",
+        //   link: "#",
+        //   subLinks: null,
+        // },
+        // {
+        //   title: "Раскраски",
+        //   link: "#",
+        //   subLinks: [
+        //     {
+        //       title: "Фиксированная палитра",
+        //       link: "#",
+        //     },
+        //     {
+        //       title: "Свободная палитра",
+        //       link: "/free-paint",
+        //     },
+        //     {
+        //       title: "Каталог раскрасок",
+        //       link: "#",
+        //     },
+        //   ],
+        // },
         {
           title: "Блог",
           link: "#",
           subLinks: null,
         },
-        {
-          title: "Активности",
-          link: "#",
-          subLinks: [
-            {
-              title: "Приключения",
-              link: "#",
-            },
-            {
-              title: "Конкурсы",
-              link: "#",
-            },
-            {
-              title: "Мини-игры",
-              link: "#",
-            },
-            {
-              title: "Сражения",
-              link: "#",
-            },
-          ],
-        },
+        // {
+        //   title: "Активности",
+        //   link: "#",
+        //   subLinks: [
+        //     {
+        //       title: "Приключения",
+        //       link: "#",
+        //     },
+        //     {
+        //       title: "Конкурсы",
+        //       link: "#",
+        //     },
+        //     {
+        //       title: "Мини-игры",
+        //       link: "#",
+        //     },
+        //     {
+        //       title: "Сражения",
+        //       link: "#",
+        //     },
+        //   ],
+        // },
       ],
     };
   },
@@ -108,13 +108,14 @@ export default {
 </script>
 <style lang="scss" scoped>
 .header-nav {
-  margin-bottom: 10px;
+  color: white;
 
   @media (min-width: 992px) {
-    margin-left: 60px;
-    margin-top: auto;
-    margin-bottom: 0;
     flex-grow: 1;
+  }
+
+  @media (max-width: 980px) {
+    margin-top: 50px;
   }
 
   & a {
@@ -127,7 +128,7 @@ export default {
   ul {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    justify-content: center;
 
     @media (min-width: 992px) {
       flex-direction: row;
@@ -136,10 +137,7 @@ export default {
   }
 
   & > ul {
-    margin-top: 30px;
-    @media (min-width: 992px) {
-      margin-top: 20px;
-    }
+    line-height: 60px;
   }
   li {
     margin-right: 20px;
@@ -200,19 +198,21 @@ export default {
   padding-right: 15px;
   display: inline-block;
 }
+.nav_ul a {
+  transition: 0.4s;
+  &:hover {
+    color: #ffd600;
+  }
 
-.nav_ul a:hover {
-  color: #bd00c6;
-}
-
-.nav_ul a:active {
-  color: #6f00c6;
+  &:active {
+    color: #ffa200;
+  }
 }
 
 .nested_link > a:hover {
   &:after {
-    border-bottom: 3px solid #bd00c6;
-    border-right: 3px solid #bd00c6;
+    border-bottom: 3px solid #ffd600;
+    border-right: 3px solid #ffd600;
   }
 }
 

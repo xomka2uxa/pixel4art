@@ -1,39 +1,19 @@
 <template>
   <div class="header__btn">
-    <a href="#" class="login_wrapper">
-      <svg
-        width="20"
-        height="20"
-        viewBox="0 0 20 20"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M14 10L8 5V8H1V12H8V15L14 10ZM17
-          17H9V19H17C18.1 19 19 18.1 19 17V3C19 1.9 18.1 1 17 1H9V3H17V17Z"
-          fill="black"
-        />
-      </svg>
+    <a
+      href="#"
+      class="login_wrapper"
+      v-if="isHeaderCanClose"
+      @click="hiddenHeaderToggle"
+    >
+      <mdicon name="arrow-up-thick" class="preheader-soc" />
     </a>
-    <div class="border">
-      <svg
-        width="1"
-        height="52"
-        viewBox="0 0 1 52"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <line
-          x1="0.5"
-          y1="-2.18557e-08"
-          x2="0.500002"
-          y2="52"
-          stroke="white"
-          stroke-opacity="0.22"
-        />
-      </svg>
-    </div>
-    <a href="#" class="vk__wrapper">
+    <div class="border" v-if="isHeaderCanClose"></div>
+    <a
+      href="#"
+      class="vk__wrapper preheader-soc"
+      :class="isHeaderTransparent ? 'white' : ''"
+    >
       <svg
         width="20"
         height="12"
@@ -73,11 +53,14 @@
           19.9601 1.74952 18.4101 3.94927C18.1491 4.31555 17.9201 4.6325 17.7191
           4.90957C16.3141 6.84485 16.3141 6.94245 17.8021
           8.41176Z"
-          fill="#000209"
         />
       </svg>
     </a>
-    <a href="#" class="tg_wrapper">
+    <a
+      href="#"
+      class="tg_wrapper preheader-soc"
+      :class="isHeaderTransparent ? 'white' : ''"
+    >
       <svg
         width="20"
         height="16"
@@ -93,13 +76,25 @@
           10.4531L7.86943 14.779C8.30581 14.779 8.49554 14.5893 8.72322
           14.3616L10.7723 12.3884L15.0223 15.519C15.8002 15.9554 16.3505
           15.7277 16.5592 14.798Z"
-          fill="#000209"
         />
       </svg>
     </a>
   </div>
 </template>
+<script>
+import { mapGetters } from "vuex";
+export default {
+  computed: {
+    ...mapGetters(["isHeaderTransparent", "isHeaderCanClose"]),
+  },
 
+  methods: {
+    hiddenHeaderToggle() {
+      this.$emit("SetHeaderToggle");
+    },
+  },
+};
+</script>
 <style lang="scss" scoped>
 .header__btn {
   align-items: center;
@@ -117,39 +112,40 @@
     width: 34px;
     height: 34px;
     border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.3);
+    background-color: rgba(255, 255, 255, 0.1);
     display: flex;
     align-items: center;
     justify-content: center;
 
     &:hover {
-      background-color: rgba(255, 255, 255, 0.4);
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    @media (max-width: 980px) {
+      background-color: rgba(255, 255, 255, 0.1);
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+      }
     }
   }
 }
 
 .header__btn .login_wrapper {
-  background: linear-gradient(to right, #0900c8 0%, #bd00c6 100%) no-repeat;
   margin-right: 10px;
 
   @media (min-width: 992px) {
     margin-right: 0;
   }
 }
-.header__btn .login_wrapper:hover {
-  background: linear-gradient(to left, #0900c8 0%, #bd00c6 100%) no-repeat;
-}
-.header__btn .login_wrapper:active {
-  background: #6f00c6;
-}
+
 .header__btn .border {
   margin-left: 10px;
   margin-right: 10px;
-  display: none;
-
-  @media (min-width: 992px) {
-    display: block;
-  }
+  height: 70%;
+  width: 1px;
+  background-color: rgba(255, 255, 255, 0.1);
+  content: "";
 }
 
 .vk__wrapper {

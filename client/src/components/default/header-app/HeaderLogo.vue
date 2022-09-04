@@ -1,16 +1,16 @@
 <template>
   <div class="logo">
-    <a href="index.html">
+    <router-link to="/">
       <img class="logo__img" src="@/assets/img/logo1.png" alt="PIX4ART" />
-    </a>
+    </router-link>
   </div>
 </template>
 
 <style lang="scss" scoped>
 .logo {
   &__img {
-    width: 40%;
-    height: 40%;
+    width: 105px;
+    display: block;
   }
 }
 </style>

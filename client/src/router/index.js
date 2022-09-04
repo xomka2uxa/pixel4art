@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "../views/HomeView.vue";
 import FreePaint from "../views/FreePaint.vue";
+import AppTest from "../views/AppTest.vue";
 
 const routes = [
   {
@@ -12,6 +13,12 @@ const routes = [
     path: "/free-paint",
     name: "FreePaint",
     component: FreePaint,
+  },
+
+  {
+    path: "/test",
+    name: "test",
+    component: AppTest,
   },
 ];
 
