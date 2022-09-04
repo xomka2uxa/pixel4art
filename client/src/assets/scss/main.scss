@@ -31,3 +31,37 @@
     height: 24px;
   }
 }
+
+.preheader-mdi {
+  opacity: 0.3;
+  transition-duration: .5s;
+
+  svg {
+    fill: #fff;
+    width: 20px;
+    height: 20px;
+  }
+
+  &:hover {
+    opacity: 0.4;
+  }
+}
+
+.preheader-soc {
+  transition-duration: .5s;
+
+  svg {
+    fill: $bg-preheader;
+    width: 20px;
+    height: 20px;
+
+    @media (max-width: 980px) {
+      fill: rgba(255, 255, 255, 0.4);
+    } 
+  }
+}
+.preheader-soc.white {
+  svg {
+    fill: rgba(255, 255, 255, 0.2);
+  }
+}

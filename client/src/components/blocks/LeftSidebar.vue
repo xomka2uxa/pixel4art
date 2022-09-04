@@ -346,6 +346,7 @@ export default {
 
   .__inner {
     padding: 75px 10px;
+    margin-top: 60px;
     height: 100%;
     overflow: auto;
   }
