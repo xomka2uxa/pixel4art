@@ -3,7 +3,7 @@ const defaultSizePaint = { name: "sm", value: [50, 50] };
 
 export default createStore({
   state: {
-    selectedColor: "",
+    selectedColor: "rgb(255, 136, 0)",
     colorPallete: [],
     selectedSizePaint: defaultSizePaint,
     defaultSizesPaint: {

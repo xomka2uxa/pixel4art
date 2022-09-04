@@ -73,7 +73,7 @@
         <div class="row mx-5 align-center">
           <div class="col px-5">Выбрать цвет:</div>
           <div class="col px-5 ml-auto">
-            <Popper>
+            <Popper placement="right">
               <button
                 class="btn --circle"
                 :style="{ background: selectedColor }"
@@ -88,27 +88,11 @@
                     default-format="rgb"
                     :visible-formats="['hex']"
                     alpha-channel="hide"
-                    @color-change="updateColor"
+                    @color-change="chooseColor"
                   >
                     <template #copy-button>
-                      <div>
-                        <svg
-                          aria-hidden="true"
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="15"
-                          height="15"
-                          viewBox="0 0 15 15"
-                        >
-                          <path
-                            d="M5 0v2H1v13h12v-3h-1v2H2V5h10v3h1V2H9V0zm1 1h2v2h3v1H3V3h3z"
-                            fill="currentColor"
-                          />
-
-                          <path
-                            d="M10 7v2h5v2h-5v2l-3-3zM3 6h5v1H3zm0 2h3v1H3zm0 2h3v1H3zm0 2h5v1H3z"
-                            fill="currentColor"
-                          />
-                        </svg>
+                      <div title="Выбрать цвет" @click="updateDrawingColor">
+                        <mdicon name="content-copy" class="my-mdi" />
                       </div>
                     </template>
                   </ColorPicker>
@@ -144,6 +128,51 @@
             :class="['color-item', item === selectedColor ? '_active' : '']"
             :style="{ background: item }"
             @click="chooseColorInPallete(item)"
+          ></div>
+        </div>
+      </div>
+
+      <div class="__box color-pallete canvas-pallete">
+        <div class="__header">
+          <div class="__title">Использованные цвета</div>
+          <Popper placement="right">
+            <button
+              v-if="selectedColorForChange"
+              class="btn --circle"
+              :style="{ background: selectedColorForChange }"
+              title="Заменить цвет"
+            >
+              <mdicon name="palette" class="my-mdi" />
+            </button>
+            <template #content>
+              <div class="color-picker">
+                <ColorPicker
+                  color="#f80b"
+                  default-format="rgb"
+                  :visible-formats="['hex']"
+                  alpha-channel="hide"
+                  @color-change="chooseColorForReplace"
+                >
+                  <template #copy-button>
+                    <div title="Заменить цвет" @click="replaceColorOnCanvas">
+                      <mdicon name="content-copy" class="my-mdi" />
+                    </div>
+                  </template>
+                </ColorPicker>
+              </div>
+            </template>
+          </Popper>
+        </div>
+        <div v-if="colorsOnCanvas.length" class="__body color-list">
+          <div
+            v-for="(item, i) in colorsOnCanvas"
+            :key="i"
+            :class="[
+              'color-item',
+              item === selectedColorForChange ? '_active' : '',
+            ]"
+            :style="{ background: item }"
+            @click="chooseColorOnCanvas(item)"
           ></div>
         </div>
       </div>
@@ -191,9 +220,9 @@ export default {
     ColorPicker,
   },
 
-  props: ["scaleInPrc"],
+  props: ["scaleInPrc", "colorsOnCanvas"],
 
-  emits: ["doScaling"],
+  emits: ["doScaling", "replaceColorOnCanvas"],
 
   data() {
     return {
@@ -203,6 +232,9 @@ export default {
         rows: "",
       },
       showModal: false,
+      drawingColor: "",
+      selectedColorForChange: "",
+      selectedNewColorForChange: "",
     };
   },
 
@@ -222,8 +254,34 @@ export default {
   },
 
   methods: {
-    updateColor(e) {
-      this.$store.dispatch("setSelectedColor", e.cssColor);
+    updateDrawingColor() {
+      this.$store.dispatch("setSelectedColor", this.drawingColor);
+    },
+
+    chooseColor(e) {
+      this.drawingColor = e.cssColor;
+    },
+
+    chooseColorForReplace(e) {
+      this.selectedNewColorForChange = e.cssColor;
+    },
+
+    replaceColorOnCanvas() {
+      if (
+        this.selectedColorForChange &&
+        this.selectedColorForChange !== this.selectedNewColorForChange
+      ) {
+        this.$emit("replaceColorOnCanvas", {
+          oldColor: this.selectedColorForChange,
+          newColor: this.selectedNewColorForChange,
+        });
+
+        this.selectedColorForChange = this.selectedNewColorForChange;
+      }
+    },
+
+    chooseColorOnCanvas(item) {
+      this.selectedColorForChange = item;
     },
 
     addColorInPollete() {
@@ -243,7 +301,6 @@ export default {
     },
 
     chooseCustomSize() {
-      console.log(this.customSizePaint, this.sizePaint);
       this.$store.dispatch("setCustomSizePaint", this.customSizePaint);
       this.sizePaint = "custom";
     },
