@@ -4,29 +4,18 @@
       <div class="__box control-btn">
         <div class="row mx-5">
           <div class="col px-5">
-            <button
-              class="btn --circle"
-              title="Очистить холст"
-              @click="makeCanvasCleanModal"
-            >
+            <button class="btn --circle" title="Очистить холст" @click="makeCanvasCleanModal">
               <mdicon name="cached" class="my-mdi" />
             </button>
-            <vue-final-modal
-              v-model="showModal"
-              classes="modal-container"
-              content-class="modal-content"
-            >
+            <vue-final-modal v-model="showModal" classes="modal-container" content-class="modal-content">
               <div class="shure-content-modal">
                 <div class="modal__text">
-                  Вы уверены, что хотите очистить холст? <br />Все нарисованное
-                  будет утеряно!
+                  Вы уверены, что хотите очистить холст? <br />Все нарисованное будет утеряно!
                 </div>
                 <div class="modal__actions">
                   <div class="row">
                     <div class="col">
-                      <button class="btn" @click="showModal = false">
-                        Нет
-                      </button>
+                      <button class="btn" @click="showModal = false">Нет</button>
                     </div>
                     <div class="col">
                       <button class="btn" @click="makeCanvasClean">Да</button>
@@ -37,22 +26,12 @@
             </vue-final-modal>
           </div>
           <div class="col px-5 ml-auto">
-            <button
-              class="btn --circle"
-              title="Отменить последнее действие"
-              :disabled="cntHistoryAction >= 5"
-              @click="undoLastAction"
-            >
+            <button class="btn --circle" title="Отменить последнее действие" @click="undoLastAction">
               <mdicon name="arrow-u-left-top" class="my-mdi" />
             </button>
           </div>
           <div class="col px-5">
-            <button
-              class="btn --circle"
-              title="Вернуть последнее действие"
-              :disabled="cntHistoryAction <= 0"
-              @click="returnFromHistoryList"
-            >
+            <button class="btn --circle" title="Вернуть последнее действие" @click="returnFromHistoryList">
               <mdicon name="arrow-u-right-top" class="my-mdi" />
             </button>
           </div>
@@ -74,11 +53,7 @@
           <div class="col px-5">Выбрать цвет:</div>
           <div class="col px-5 ml-auto">
             <Popper placement="right">
-              <button
-                class="btn --circle"
-                :style="{ background: selectedColor }"
-                title="Выбрать цвет"
-              >
+              <button class="btn --circle" :style="{ background: selectedColor }" title="Выбрать цвет">
                 <mdicon name="format-color-fill" class="my-mdi" />
               </button>
               <template #content>
@@ -113,11 +88,7 @@
           >
             <mdicon name="eyedropper-variant" class="my-mdi" />
           </button>
-          <button
-            class="__btn btn --circle --no-padding"
-            title="Удалить из палитры увет"
-            @click="removeColorInPollete"
-          >
+          <button class="__btn btn --circle --no-padding" title="Удалить из палитры увет" @click="removeColorInPollete">
             <mdicon name="trash-can-outline" class="my-mdi" />
           </button>
         </div>
@@ -167,10 +138,7 @@
           <div
             v-for="(item, i) in colorsOnCanvas"
             :key="i"
-            :class="[
-              'color-item',
-              item === selectedColorForChange ? '_active' : '',
-            ]"
+            :class="['color-item', item === selectedColorForChange ? '_active' : '']"
             :style="{ background: item }"
             @click="chooseColorOnCanvas(item)"
           ></div>
@@ -180,27 +148,16 @@
       <div class="__box choose-size">
         <div class="__title">Выбрать размер</div>
         <select v-model="sizePaint">
-          <option
-            v-for="(val, name) in defaultSizesPaint"
-            :key="name"
-            :value="name"
-            :disabled="name == 'custom'"
-          >
+          <option v-for="(val, name) in defaultSizesPaint" :key="name" :value="name" :disabled="name == 'custom'">
             {{ getTextSizePaint(val) }}
           </option>
         </select>
-        <button @click="chooseSize" :disabled="sizePaint == 'custom'">
-          OK
-        </button>
+        <button @click="chooseSize" :disabled="sizePaint == 'custom'">OK</button>
       </div>
       <div class="__box choose-size">
         <div class="__title">Задать свой размер</div>
-        <label for=""
-          >Ширина: <input v-model="customSizePaint.cols" type="text"
-        /></label>
-        <label for=""
-          >Высота: <input v-model="customSizePaint.rows" type="text"
-        /></label>
+        <label for="">Ширина: <input v-model="customSizePaint.cols" type="text" /></label>
+        <label for="">Высота: <input v-model="customSizePaint.rows" type="text" /></label>
         <button @click="chooseCustomSize">ОК</button>
         <div class="__title">Не может превышать 800x600</div>
       </div>
@@ -267,10 +224,7 @@ export default {
     },
 
     replaceColorOnCanvas() {
-      if (
-        this.selectedColorForChange &&
-        this.selectedColorForChange !== this.selectedNewColorForChange
-      ) {
+      if (this.selectedColorForChange && this.selectedColorForChange !== this.selectedNewColorForChange) {
         this.$emit("replaceColorOnCanvas", {
           oldColor: this.selectedColorForChange,
           newColor: this.selectedNewColorForChange,
@@ -320,7 +274,6 @@ export default {
 
     undoLastAction() {
       this.$store.dispatch("undoLastAction", true);
-      this.$store.dispatch("setHistoryMode", true);
     },
 
     returnFromHistoryList() {

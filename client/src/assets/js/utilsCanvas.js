@@ -14,9 +14,7 @@ export function isRectUniqueFn(rectList, color, newRect) {
     if (rectList[i].color == color) {
       for (let j = 0; j < rectList[i].arr.length; j++) {
         for (let k = 0; k < rectList[i].arr[j].length; k++) {
-          if (
-            JSON.stringify(rectList[i].arr[j][k]) == JSON.stringify(newRect)
-          ) {
+          if (JSON.stringify(rectList[i].arr[j][k]) == JSON.stringify(newRect)) {
             isRectUnique = false;
           }
         }

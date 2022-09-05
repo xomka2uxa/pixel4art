@@ -21,10 +21,7 @@
 
 <script>
 import { mapGetters } from "vuex";
-import {
-  getColorIndexInRectList,
-  isRectUniqueFn,
-} from "@/assets/js/utilsCanvas.js";
+import { getColorIndexInRectList, isRectUniqueFn } from "@/assets/js/utilsCanvas.js";
 import LeftSidebar from "@/components/blocks/LeftSidebar.vue";
 
 /*
@@ -35,7 +32,6 @@ import LeftSidebar from "@/components/blocks/LeftSidebar.vue";
 4. В массив добавляется два квадрата одинаковых
 5. В массиве не заменяется квадрат на том же месте а просто добавляется
 6. Очищать историю при очищении всего канваса
-7. убрать ошибку PCanvas2.vue?439a:92 Uncaught TypeError: Cannot read properties of null (reading 'offsetWidth')
 8. при выходе мыши за канвас если рисовали то надо продолжать рисовать если перемещали то продолжать перемещать
 9. Переписать события из саййдбара без стора
 10. Двигать по целым пикселям при масштабировании
@@ -49,8 +45,6 @@ import LeftSidebar from "@/components/blocks/LeftSidebar.vue";
 */
 
 /*
-16. Не добавлять объект в массив если он уже есть.
-17. Переделать историю
 18. Сделать удаление цвета из цветов на канвасе если их нет
 */
 export default {
@@ -140,64 +134,42 @@ export default {
     },
 
     "$store.state.isUndoLastAction": function (val) {
-      console.log(this.rectListHistory.arr, 222);
-      if (
-        val &&
-        this.rectList.length &&
-        this.rectListHistory.cnt < this.rectListHistory.arr.length
-      ) {
-        console.log(this.cntHistoryAction, this.rectListHistory.arr, 555);
-        const index =
-          this.rectListHistory.arr.length - this.cntHistoryAction - 1;
+      if (val && this.rectListHistory.arr.length && !this.rectListHistory.arr[0].isHistory) {
+        const index = this.rectListHistory.cnt;
         this.rectListHistory.arr[index].isHistory = true;
         for (let i = 0; i < this.rectList.length; i++) {
           if (this.rectList[i].color == this.rectListHistory.arr[index].color) {
             this.rectList[i].arr.pop();
           }
         }
-        this.rectListHistory.cnt++;
-        this.$store.dispatch("setCntHistoryAction", true);
+
+        this.rectListHistory.cnt--;
       }
+
       this.$store.dispatch("undoLastAction", false);
     },
 
-    /*
-      у меня есть история
-    */
-
     "$store.state.isReturnFromHistoryList": function (val) {
-      if (val && this.cntHistoryAction >= 0) {
-        const index = this.rectListHistory.arr.length - this.cntHistoryAction;
-        console.log(index);
+      if (val && this.rectListHistory.arr.at(-1).isHistory) {
+        this.rectListHistory.cnt++;
+        const index = this.rectListHistory.cnt;
+
         if (this.rectListHistory.arr.length) {
-          this.rectListHistory.arr[index].isHistory = true;
+          this.rectListHistory.arr[index].isHistory = false;
 
           for (let i = 0; i < this.rectList.length; i++) {
-            if (
-              this.rectList[i].color == this.rectListHistory.arr[index].color
-            ) {
+            if (this.rectList[i].color == this.rectListHistory.arr[index].color) {
               this.rectList[i].arr.push(this.rectListHistory.arr[index].arr);
             }
           }
-
-          this.rectList.push(this.rectListHistory.arr.at(-1));
-          this.$store.dispatch("setCntHistoryAction", false);
-          this.rectListHistory.cnt--;
         }
-
-        this.$store.dispatch("returnFromHistoryList", false);
       }
+      this.$store.dispatch("returnFromHistoryList", false);
     },
   },
 
   computed: {
-    ...mapGetters([
-      "selectedColor",
-      "selectedSizePaint",
-      "isCanvasClean",
-      "cntHistoryAction",
-      "historyMode",
-    ]),
+    ...mapGetters(["selectedColor", "selectedSizePaint", "isCanvasClean", "cntHistoryAction", "historyMode"]),
   },
 
   methods: {
@@ -226,8 +198,8 @@ export default {
         this.ctx = this.canvas.getContext("2d");
       }
       const container = this.$refs.containerCanvas;
-      this.cc.width = container.offsetWidth;
-      this.cc.height = container.offsetHeight;
+      this.cc.width = container?.offsetWidth || this.cc.width;
+      this.cc.height = container?.offsetHeight || this.cc.height;
       this.canvas.width = container.offsetWidth;
       this.canvas.height = container.offsetHeight;
     },
@@ -238,9 +210,7 @@ export default {
       this.gc.x = this.cc.width / 2 - this.gc.width / 2;
       this.gc.y = this.cc.height / 2 - this.gc.height / 2;
 
-      this.scaleInPrc = Math.floor(
-        ((this.cc.squareSize * this.cc.scale) / this.cc.squareSize) * 100
-      );
+      this.scaleInPrc = Math.floor(((this.cc.squareSize * this.cc.scale) / this.cc.squareSize) * 100);
     },
 
     drawGroup() {
@@ -252,25 +222,13 @@ export default {
     drawLines() {
       this.ctx.beginPath();
       for (let i = 0; i < this.cc.rows + 1; i++) {
-        this.ctx.moveTo(
-          this.gc.x,
-          this.gc.y + i * this.cc.squareSize * this.cc.scale
-        );
-        this.ctx.lineTo(
-          this.gc.x + this.gc.width,
-          this.gc.y + i * this.cc.squareSize * this.cc.scale
-        );
+        this.ctx.moveTo(this.gc.x, this.gc.y + i * this.cc.squareSize * this.cc.scale);
+        this.ctx.lineTo(this.gc.x + this.gc.width, this.gc.y + i * this.cc.squareSize * this.cc.scale);
       }
 
       for (let i = 0; i < this.cc.cols + 1; i++) {
-        this.ctx.moveTo(
-          this.gc.x + i * this.cc.squareSize * this.cc.scale,
-          this.gc.y
-        );
-        this.ctx.lineTo(
-          this.gc.x + i * this.cc.squareSize * this.cc.scale,
-          this.gc.y + this.gc.height
-        );
+        this.ctx.moveTo(this.gc.x + i * this.cc.squareSize * this.cc.scale, this.gc.y);
+        this.ctx.lineTo(this.gc.x + i * this.cc.squareSize * this.cc.scale, this.gc.y + this.gc.height);
       }
 
       this.ctx.strokeStyle = "#000";
@@ -284,12 +242,8 @@ export default {
           for (let k = 0; k < this.rectList[i].arr[j].length; k++) {
             this.ctx.fillStyle = this.rectList[i].color;
             this.ctx.fillRect(
-              this.gc.x +
-                this.rectList[i].arr[j][k].col *
-                  (this.cc.squareSize * this.cc.scale),
-              this.gc.y +
-                this.rectList[i].arr[j][k].row *
-                  (this.cc.squareSize * this.cc.scale),
+              this.gc.x + this.rectList[i].arr[j][k].col * (this.cc.squareSize * this.cc.scale),
+              this.gc.y + this.rectList[i].arr[j][k].row * (this.cc.squareSize * this.cc.scale),
               this.cc.squareSize * this.cc.scale,
               this.cc.squareSize * this.cc.scale
             );
@@ -299,11 +253,6 @@ export default {
     },
 
     drawRect(e) {
-      if (this.historyMode) {
-        this.rectListHistory.arr = [];
-        this.$store.dispatch("setHistoryMode", false);
-        this.$store.dispatch("setCntHistoryAction", null);
-      }
       const shiftX = e.offsetX - this.gc.x;
       const realSquareSizeX = this.gc.width / this.cc.cols;
       const shiftRectX = Math.floor(shiftX / realSquareSizeX);
@@ -356,7 +305,10 @@ export default {
         this.rectListHistory.arr.shift();
       }
 
-      console.log(this.rectList[0].arr, this.rectListHistory.arr, 888);
+      this.rectListHistory.arr = this.rectListHistory.arr.filter((el) => {
+        return !el.isHistory;
+      });
+      this.rectListHistory.cnt = this.rectListHistory.arr.length - 1;
 
       this.ctx.fillStyle = color;
       this.ctx.fillRect(
@@ -435,11 +387,9 @@ export default {
     setNewScale(direction) {
       const container = this.$refs.containerCanvas;
       const oldScale = this.cc.scale;
-      const newScale =
-        direction > 0 ? oldScale * this.cc.scaleBy : oldScale / this.cc.scaleBy;
+      const newScale = direction > 0 ? oldScale * this.cc.scaleBy : oldScale / this.cc.scaleBy;
 
-      const isCanScaleByUp =
-        this.gc.width / this.cc.cols < this.cc.squareSize * 2;
+      const isCanScaleByUp = this.gc.width / this.cc.cols < this.cc.squareSize * 2;
       const diffX = container.offsetWidth - this.gc.width;
       const diffY = container.offsetHeight - this.gc.height;
 
@@ -454,23 +404,16 @@ export default {
             : this.gc.height > this.cc.rows * this.cc.squareSize;
       } else {
         isCanScaleByDown =
-          diffX < diffY
-            ? this.gc.width > container.offsetWidth * 0.9
-            : this.gc.height > container.offsetHeight * 0.9;
+          diffX < diffY ? this.gc.width > container.offsetWidth * 0.9 : this.gc.height > container.offsetHeight * 0.9;
       }
 
-      if (
-        (direction > 0 && isCanScaleByUp) ||
-        (direction < 0 && isCanScaleByDown)
-      ) {
+      if ((direction > 0 && isCanScaleByUp) || (direction < 0 && isCanScaleByDown)) {
         this.cc.scale = newScale;
         const oldWidth = this.gc.width;
         const oldHeight = this.gc.height;
         this.gc.width = this.cc.cols * this.cc.squareSize * this.cc.scale;
         this.gc.height = this.cc.rows * this.cc.squareSize * this.cc.scale;
-        this.scaleInPrc = Math.floor(
-          ((this.cc.squareSize * this.cc.scale) / this.cc.squareSize) * 100
-        );
+        this.scaleInPrc = Math.floor(((this.cc.squareSize * this.cc.scale) / this.cc.squareSize) * 100);
 
         this.gc.x -= (this.gc.width - oldWidth) / 2;
         this.gc.y -= (this.gc.height - oldHeight) / 2;
@@ -514,6 +457,12 @@ export default {
       for (let i = 0; i < this.colorsOnCanvas.length; i++) {
         if (this.colorsOnCanvas[i] == oldColor) {
           this.colorsOnCanvas[i] = newColor;
+        }
+      }
+
+      for (let i = 0; i < this.rectListHistory.arr.length; i++) {
+        if (this.rectListHistory.arr[i].color == oldColor) {
+          this.rectListHistory.arr[i].color = newColor;
         }
       }
     },

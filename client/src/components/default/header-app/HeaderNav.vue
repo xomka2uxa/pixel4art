@@ -1,11 +1,7 @@
 <template>
   <div class="header-nav">
     <ul class="nav_ul">
-      <li
-        v-for="(item, i) in routeList"
-        :key="i"
-        :class="item.subLinks ? 'nested_link' : ''"
-      >
+      <li v-for="(item, i) in routeList" :key="i" :class="item.subLinks ? 'nested_link' : ''">
         <router-link :to="item.link">{{ item.title }}</router-link>
         <div v-if="item.subLinks" class="nested_nav__wrapper">
           <ul class="nested_nav">

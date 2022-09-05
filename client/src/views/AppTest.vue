@@ -21,11 +21,7 @@ export default {
     return {
       message: "Пример",
       seen: true,
-      todos: [
-        { text: "Изучить JavaScript" },
-        { text: "Изучить JavaScript" },
-        { text: "Создать что-нибудь классное" },
-      ],
+      todos: [{ text: "Изучить JavaScript" }, { text: "Изучить JavaScript" }, { text: "Создать что-нибудь классное" }],
     };
   },
 

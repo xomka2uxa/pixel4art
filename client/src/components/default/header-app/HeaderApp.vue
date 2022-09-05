@@ -1,11 +1,5 @@
 <template>
-  <div
-    class="header"
-    :class="[
-      isHeaderTransparent ? 'transparent' : '',
-      isHeaderHidden ? 'hide' : '',
-    ]"
-  >
+  <div class="header" :class="[isHeaderTransparent ? 'transparent' : '', isHeaderHidden ? 'hide' : '']">
     <div class="__inner">
       <preheader-app />
       <div class="header-bottom">
@@ -22,11 +16,7 @@
         </div>
       </div>
     </div>
-    <header-open
-      class="__open-btn"
-      :is-header-hidden="isHeaderHidden"
-      @click="swopeHeaderToggle"
-    />
+    <header-open class="__open-btn" :is-header-hidden="isHeaderHidden" @click="swopeHeaderToggle" />
   </div>
 </template>
 

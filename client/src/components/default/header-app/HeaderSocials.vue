@@ -1,26 +1,11 @@
 <template>
   <div class="header__btn">
-    <a
-      href="#"
-      class="login_wrapper"
-      v-if="isHeaderCanClose"
-      @click="hiddenHeaderToggle"
-    >
+    <a href="#" class="login_wrapper" v-if="isHeaderCanClose" @click="hiddenHeaderToggle">
       <mdicon name="arrow-up-thick" class="preheader-soc" />
     </a>
     <div class="border" v-if="isHeaderCanClose"></div>
-    <a
-      href="#"
-      class="vk__wrapper preheader-soc"
-      :class="isHeaderTransparent ? 'white' : ''"
-    >
-      <svg
-        width="20"
-        height="12"
-        viewBox="0 0 20 12"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
+    <a href="#" class="vk__wrapper preheader-soc" :class="isHeaderTransparent ? 'white' : ''">
+      <svg width="20" height="12" viewBox="0 0 20 12" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path
           d="M17.8021 8.41176C17.8021 8.41176 19.4191 10.0878 19.8191
           10.8634C19.8301 10.8802 19.8351 10.8928 19.8371 10.9001C20.0001 11.1866 20.0401
@@ -56,18 +41,8 @@
         />
       </svg>
     </a>
-    <a
-      href="#"
-      class="tg_wrapper preheader-soc"
-      :class="isHeaderTransparent ? 'white' : ''"
-    >
-      <svg
-        width="20"
-        height="16"
-        viewBox="0 0 20 16"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
+    <a href="#" class="tg_wrapper preheader-soc" :class="isHeaderTransparent ? 'white' : ''">
+      <svg width="20" height="16" viewBox="0 0 20 16" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path
           d="M16.5592 14.798L19.3482 1.64955C19.5949 0.492186 18.9308
           0.0368287 18.1719 0.321427L1.77902 6.63951C0.659604 7.07589

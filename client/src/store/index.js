@@ -76,9 +76,7 @@ export default createStore({
 
     removeColorInPallete(state, color) {
       state.colorPallete = state.colorPallete.filter((c) => c !== color);
-      state.selectedColor = state.colorPallete.length
-        ? state.colorPallete[0]
-        : "rgb(255, 136, 0)";
+      state.selectedColor = state.colorPallete.length ? state.colorPallete[0] : "rgb(255, 136, 0)";
     },
 
     setSizePaint(state, size) {
