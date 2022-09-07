@@ -1,5 +1,5 @@
 <template>
-  <div class="left-sidebar">
+  <div class="left-sidebar" :class="[isHeaderHidden ? '_header-hidden' : '']">
     <div class="__inner">
       <div class="__box control-btn">
         <div class="row mx-5">
@@ -52,7 +52,7 @@
         <div class="row mx-5 align-center">
           <div class="col px-5">Выбрать цвет:</div>
           <div class="col px-5 ml-auto">
-            <Popper placement="right">
+            <Popper placement="auto">
               <button class="btn --circle" :style="{ background: selectedColor }" title="Выбрать цвет">
                 <mdicon name="format-color-fill" class="my-mdi" />
               </button>
@@ -208,6 +208,8 @@ export default {
       "defaultSizesPaint",
       "cntHistoryAction",
     ]),
+
+    ...mapGetters("header", ["isHeaderHidden"]),
   },
 
   methods: {
@@ -289,17 +291,21 @@ export default {
 <style lang="scss" scoped>
 .left-sidebar {
   position: absolute;
-  top: 0;
+  top: 110px;
   left: 0;
   bottom: 0;
   width: 200px;
   background: #fff;
   border-right: 3px solid #cbcbcb;
   color: #333;
+  transition: top 0.4s;
+
+  &._header-hidden {
+    top: 0;
+  }
 
   .__inner {
-    padding: 75px 10px;
-    margin-top: 60px;
+    padding: 10px 10px 75px;
     height: 100%;
     overflow: auto;
   }

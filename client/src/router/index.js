@@ -14,7 +14,6 @@ const routes = [
     name: "FreePaint",
     component: FreePaint,
   },
-
   {
     path: "/test",
     name: "test",

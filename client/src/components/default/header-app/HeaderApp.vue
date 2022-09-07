@@ -1,29 +1,29 @@
 <template>
   <div class="header" :class="[isHeaderTransparent ? 'transparent' : '', isHeaderHidden ? 'hide' : '']">
     <div class="__inner">
-      <preheader-app />
+      <header-top />
       <div class="header-bottom">
         <div class="container --fluid">
           <div class="header__inner">
             <header-logo />
             <header-burger @open="openMenuToggle" />
-            <header-nav-wrapper
-              :is-open-menu="isOpenMenu"
-              @close="openMenuToggle"
-              @set-header-toggle="swopeHeaderToggle"
-            />
+            <header-nav-wrapper :is-open-menu="isOpenMenu" @close="openMenuToggle" />
           </div>
         </div>
       </div>
     </div>
-    <header-open class="__open-btn" :is-header-hidden="isHeaderHidden" @click="swopeHeaderToggle" />
+    <header-open
+      class="__open-btn"
+      :is-header-hidden="isHeaderHidden"
+      @click="$store.dispatch('header/toggleHeaderHidden')"
+    />
   </div>
 </template>
 
 <script>
 import { mapGetters } from "vuex";
 
-import PreheaderApp from "@/components/default/header-app/PreheaderApp.vue";
+import HeaderTop from "@/components/default/header-app/HeaderTop.vue";
 import HeaderLogo from "@/components/default/header-app/HeaderLogo.vue";
 import HeaderBurger from "@/components/default/header-app/HeaderBurger.vue";
 import HeaderNavWrapper from "@/components/default/header-app/HeaderNavWrapper.vue";
@@ -33,7 +33,6 @@ export default {
   data() {
     return {
       isOpenMenu: false,
-      isHeaderHidden: false,
     };
   },
 
@@ -41,21 +40,17 @@ export default {
     HeaderLogo,
     HeaderBurger,
     HeaderNavWrapper,
-    PreheaderApp,
+    HeaderTop,
     HeaderOpen,
   },
 
   computed: {
-    ...mapGetters(["isHeaderTransparent"]),
+    ...mapGetters("header", ["isHeaderTransparent", "isHeaderHidden"]),
   },
 
   methods: {
     openMenuToggle() {
       this.isOpenMenu = !this.isOpenMenu;
-    },
-
-    swopeHeaderToggle() {
-      this.isHeaderHidden = !this.isHeaderHidden;
     },
   },
 };

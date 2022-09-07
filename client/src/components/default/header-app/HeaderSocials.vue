@@ -1,9 +1,9 @@
 <template>
   <div class="header__btn">
-    <a href="#" class="login_wrapper" v-if="isHeaderCanClose" @click="hiddenHeaderToggle">
+    <a href="#" class="login_wrapper" v-if="isHeaderCanClosed" @click="$store.dispatch('header/toggleHeaderHidden')">
       <mdicon name="arrow-up-thick" class="preheader-soc" />
     </a>
-    <div class="border" v-if="isHeaderCanClose"></div>
+    <div class="border" v-if="isHeaderCanClosed"></div>
     <a href="#" class="vk__wrapper preheader-soc" :class="isHeaderTransparent ? 'white' : ''">
       <svg width="20" height="12" viewBox="0 0 20 12" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path
@@ -60,14 +60,10 @@
 import { mapGetters } from "vuex";
 export default {
   computed: {
-    ...mapGetters(["isHeaderTransparent", "isHeaderCanClose"]),
+    ...mapGetters("header", ["isHeaderTransparent", "isHeaderCanClosed"]),
   },
 
-  methods: {
-    hiddenHeaderToggle() {
-      this.$emit("SetHeaderToggle");
-    },
-  },
+  methods: {},
 };
 </script>
 <style lang="scss" scoped>

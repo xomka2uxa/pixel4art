@@ -2,7 +2,7 @@
   <div :class="['header-nav-wrapper', isOpenMenu ? 'open' : '']">
     <menu-close @close="$emit('close')" />
     <header-nav />
-    <header-socials @set-header-toggle="$emit('SetHeaderToggle')" />
+    <header-socials />
   </div>
 </template>
 

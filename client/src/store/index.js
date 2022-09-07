@@ -1,7 +1,12 @@
 import { createStore } from "vuex";
+import header from "./modules/header";
 const defaultSizePaint = { name: "sm", value: [50, 50] };
 
 export default createStore({
+  modules: {
+    header,
+  },
+
   state: {
     selectedColor: "rgb(255, 136, 0)",
     colorPallete: [],
@@ -19,9 +24,8 @@ export default createStore({
     isReturnFromHistoryList: false,
     cntHistoryAction: 0,
     historyMode: false,
-    isHeaderTransparent: false,
-    isHeaderCanClose: false,
   },
+
   getters: {
     selectedColor(state) {
       return state.selectedColor;
@@ -54,15 +58,8 @@ export default createStore({
     historyMode(state) {
       return state.historyMode;
     },
-
-    isHeaderTransparent(state) {
-      return state.isHeaderTransparent;
-    },
-
-    isHeaderCanClose(state) {
-      return state.isHeaderCanClose;
-    },
   },
+
   mutations: {
     setSelectedColor(state, color) {
       state.selectedColor = color;
@@ -124,15 +121,8 @@ export default createStore({
     setHistoryMode(state, flag) {
       state.historyMode = flag;
     },
-
-    setHeaderTransparent(state, flag) {
-      state.isHeaderTransparent = flag;
-    },
-
-    setHeaderCanClose(state, flag) {
-      state.isHeaderCanClose = flag;
-    },
   },
+
   actions: {
     setSelectedColor({ commit }, color) {
       commit("setSelectedColor", color);
@@ -177,15 +167,5 @@ export default createStore({
     setHistoryMode({ commit }, flag) {
       commit("setHistoryMode", flag);
     },
-
-    setHeaderTransparent({ commit }, flag) {
-      commit("setHeaderTransparent", flag);
-    },
-
-    setHeaderCanClose({ commit }, flag) {
-      commit("setHeaderCanClose", flag);
-    },
   },
-
-  modules: {},
 });

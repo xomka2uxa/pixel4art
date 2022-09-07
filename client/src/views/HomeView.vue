@@ -13,8 +13,8 @@ export default {
   },
 
   mounted() {
-    this.$store.dispatch("setHeaderTransparent", true);
-    this.$store.dispatch("setHeaderCanClose", false);
+    this.$store.dispatch("header/setHeaderTransparent", true);
+    this.$store.dispatch("header/setHeaderCanClosed", false);
   },
 };
 </script>
