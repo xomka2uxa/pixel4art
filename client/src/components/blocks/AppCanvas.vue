@@ -26,19 +26,23 @@ import LeftSidebar from "@/components/blocks/LeftSidebar.vue";
 
 /*
 проблемы канваса
-1. В массив добавляется два квадрата одинаковых
-2. В массиве не заменяется квадрат на том же месте а просто добавляется
-4. Сделать удаление цвета из цветов на канвасе если их нет
+1. Двигать по целым пикселям при масштабировании
+2. При перемещении ставить тоже в целые пиксели когда отпускаем мышь
+
+3. В массив добавляется два квадрата одинаковых
+4. В массиве не заменяется квадрат на том же месте а просто добавляется
+5. Сделать удаление цвета из цветов на канвасе если их нет
+
 
 4. при выходе мыши за канвас если рисовали то надо продолжать рисовать если перемещали то продолжать перемещать
 5. Переписать события из саййдбара без стора
-6. Двигать по целым пикселям при масштабировании
-7. При перемещении ставить тоже в целые пиксели когда отпускаем мышь
+
 8. попробовать переводить в рисунок часть картинки
 
 == Улучшения ==
 1. сделать более плавным перемещение и масштабирование
-2. закрашивать промежуточные квадраты при закрашивании
+
+сделать линии свг или на другом канвасе
 */
 export default {
   components: {
@@ -309,14 +313,18 @@ export default {
         return !el.isHistory;
       });
       this.rectListHistory.cnt = this.rectListHistory.arr.length - 1;
+      const squareSize = this.cc.squareSize * this.cc.scale;
+      const x = this.gc.x + shiftRectX * squareSize;
+      const y = this.gc.y + shiftRectY * squareSize;
+
+      let imgd = this.ctx.getImageData(x + squareSize / 2 - 1, y + squareSize / 2 - 1, 1, 1);
+      console.log(imgd, `rgb(${imgd.data[0]}, ${imgd.data[1]}, ${imgd.data[2]})`, color, 777);
 
       this.ctx.fillStyle = color;
-      this.ctx.fillRect(
-        this.gc.x + shiftRectX * (this.cc.squareSize * this.cc.scale),
-        this.gc.y + shiftRectY * (this.cc.squareSize * this.cc.scale),
-        this.cc.squareSize * this.cc.scale,
-        this.cc.squareSize * this.cc.scale
-      );
+      this.ctx.fillRect(x, y, squareSize, squareSize);
+
+      this.ctx.fillStyle = `rgb(${imgd.data[0]}, ${imgd.data[1]}, ${imgd.data[2]})`;
+      this.ctx.fillRect(300, 300, squareSize, squareSize);
     },
 
     initScale() {
