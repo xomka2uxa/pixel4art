@@ -16,6 +16,7 @@
       @do-scaling="doScaling"
       @replace-color-on-canvas="replaceColorOnCanvas"
     />
+    <view-mode-tooltip v-if="isScaleInPrc" />
   </div>
 </template>
 
@@ -23,30 +24,25 @@
 import { mapGetters } from "vuex";
 import { getColorIndexInRectList, isRectUniqueFn } from "@/assets/js/utilsCanvas.js";
 import LeftSidebar from "@/components/blocks/LeftSidebar.vue";
-
+import ViewModeTooltip from "@/components/blocks/ViewModeTooltip.vue";
 /*
 проблемы канваса
-1. Двигать по целым пикселям при масштабировании
-2. При перемещении ставить тоже в целые пиксели когда отпускаем мышь
+3. В массиве не заменяется квадрат на том же месте а просто добавляется
+4. Сделать удаление цвета из цветов на канвасе если их нет
 
-3. В массив добавляется два квадрата одинаковых
-4. В массиве не заменяется квадрат на том же месте а просто добавляется
-5. Сделать удаление цвета из цветов на канвасе если их нет
+5. при выходе мыши за канвас если рисовали то надо продолжать рисовать если перемещали то продолжать перемещать
+6. Переписать события из саййдбара без стора
 
-
-4. при выходе мыши за канвас если рисовали то надо продолжать рисовать если перемещали то продолжать перемещать
-5. Переписать события из саййдбара без стора
-
-8. попробовать переводить в рисунок часть картинки
-
+7. попробовать переводить в рисунок часть картинки
+8. Подставлять вместо квадратов и линий картинку если меньше одного пикселя
+9. Рефаторинг
 == Улучшения ==
-1. сделать более плавным перемещение и масштабирование
-
 сделать линии свг или на другом канвасе
 */
 export default {
   components: {
     LeftSidebar,
+    ViewModeTooltip,
   },
 
   data() {
@@ -59,8 +55,8 @@ export default {
         cols: 100,
         rows: 100,
         squareSize: 20,
-        scale: 1,
-        scaleBy: 1.08,
+        scale: 0,
+        scaleBy: 1,
         x: 0,
         y: 0,
         shiftX: 0,
@@ -79,7 +75,8 @@ export default {
       timer: null,
       beginMovePaint: false,
       rectListHistory: { cnt: 0, arr: [] },
-      scaleInPrc: "",
+      scaleInPrc: 0,
+      isScaleInPrc: false,
       colorsOnCanvas: [],
     };
   },
@@ -91,21 +88,6 @@ export default {
     this.initCanvas();
     this.changeSizeCanvas();
     this.draw();
-    // this.rectList.push({ color: "rgb(255, 136, 0)", arr: [[]] });
-    // let col = 1;
-    // let row = 1;
-    // for (let i = 0; i < 10000; i++) {
-    //   const newColor = {
-    //     col,
-    //     row,
-    //   };
-    //   this.rectList[0].arr[0].push(newColor);
-    //   col++;
-    //   if (col == 100) {
-    //     col = 1;
-    //     row++;
-    //   }
-    // }
   },
 
   watch: {
@@ -183,6 +165,7 @@ export default {
     },
 
     changeSizeCanvas() {
+      this.isScaleInPrc = false;
       this.initCanvas(false);
       this.initScale();
       this.initGroup();
@@ -200,41 +183,74 @@ export default {
       this.canvas.height = container?.offsetHeight || this.canvas.height;
     },
 
-    initGroup() {
-      this.gc.width = this.cc.cols * this.cc.squareSize * this.cc.scale;
-      this.gc.height = this.cc.rows * this.cc.squareSize * this.cc.scale;
-      this.gc.x = this.cc.width / 2 - this.gc.width / 2;
-      this.gc.y = this.cc.height / 2 - this.gc.height / 2;
+    initScale() {
+      const groupWidth = this.cc.cols * this.cc.squareSize;
+      let groupHeight = this.cc.rows * this.cc.squareSize;
 
-      this.scaleInPrc = Math.floor(((this.cc.squareSize * this.cc.scale) / this.cc.squareSize) * 100);
+      const scaleWidth = (percentScale) => {
+        this.cc.scale = -Math.ceil(
+          (this.cc.squareSize - this.cc.squareSize / (groupWidth / this.cc.width)) * percentScale
+        );
+      };
+
+      const scaleHeight = (percentScale) => {
+        this.cc.scale = -Math.ceil(
+          (this.cc.squareSize - this.cc.squareSize / (groupHeight / this.cc.height)) * percentScale
+        );
+      };
+
+      if (groupWidth > this.cc.width) {
+        scaleWidth(1.1);
+
+        if ((this.cc.squareSize + this.cc.scale) * this.cc.rows > this.cc.height) {
+          scaleHeight(1.1);
+        }
+      } else if (groupHeight > this.cc.height) {
+        scaleHeight(1.1);
+      }
+
+      if (this.cc.scale < -19) {
+        this.cc.scale = -19;
+      }
+      this.scaleInPrc = Math.floor(((this.cc.squareSize + this.cc.scale) / this.cc.squareSize) * 100);
+    },
+
+    initGroup() {
+      this.gc.width = this.cc.cols * (this.cc.squareSize + this.cc.scale);
+      this.gc.height = this.cc.rows * (this.cc.squareSize + this.cc.scale);
+      this.gc.x = Math.floor(this.cc.width / 2 - this.gc.width / 2);
+      this.gc.y = Math.floor(this.cc.height / 2 - this.gc.height / 2);
     },
 
     drawGroup() {
+      this.ctx.strokeStyle = "rgba(0, 0, 0, 1)";
       this.ctx.fillStyle = "rgba(255, 255, 255, 1)";
-      this.ctx.rect(this.gc.x, this.gc.y, this.gc.width, this.gc.height);
-      this.ctx.fill();
+      this.ctx.lineWidth = 1;
+      this.ctx.fillRect(this.gc.x, this.gc.y, this.gc.width, this.gc.height);
+      this.ctx.strokeRect(this.gc.x, this.gc.y, this.gc.width, this.gc.height);
     },
 
     drawLines() {
+      const squareSize = this.isScaleInPrc ? this.cc.squareSize * this.cc.scale : this.cc.squareSize + this.cc.scale;
       this.ctx.beginPath();
       for (let i = 0; i < this.cc.rows + 1; i++) {
-        this.ctx.moveTo(this.gc.x, this.gc.y + i * this.cc.squareSize * this.cc.scale);
-        this.ctx.lineTo(this.gc.x + this.gc.width, this.gc.y + i * this.cc.squareSize * this.cc.scale);
+        this.ctx.moveTo(this.gc.x, this.gc.y + i * squareSize);
+        this.ctx.lineTo(this.gc.x + this.gc.width, this.gc.y + i * squareSize);
       }
 
       for (let i = 0; i < this.cc.cols + 1; i++) {
-        this.ctx.moveTo(this.gc.x + i * this.cc.squareSize * this.cc.scale, this.gc.y);
-        this.ctx.lineTo(this.gc.x + i * this.cc.squareSize * this.cc.scale, this.gc.y + this.gc.height);
+        this.ctx.moveTo(this.gc.x + i * squareSize, this.gc.y);
+        this.ctx.lineTo(this.gc.x + i * squareSize, this.gc.y + this.gc.height);
       }
 
       this.ctx.strokeStyle = "#000";
-      this.ctx.lineWidth = 1 * this.cc.scale;
+      this.ctx.lineWidth = squareSize / 20;
       this.ctx.stroke();
     },
 
     drawRectList() {
       // const date1 = Date.now();
-      const squareSize = this.cc.squareSize * this.cc.scale;
+      const squareSize = this.isScaleInPrc ? this.cc.squareSize * this.cc.scale : this.cc.squareSize + this.cc.scale;
       for (let i = 0; i < this.rectList.length; i++) {
         this.ctx.fillStyle = this.rectList[i].color;
         for (let j = 0; j < this.rectList[i].arr.length; j++) {
@@ -257,91 +273,78 @@ export default {
     },
 
     drawRect(e) {
-      const shiftX = e.offsetX - this.gc.x;
-      const realSquareSizeX = this.gc.width / this.cc.cols;
-      const shiftRectX = Math.floor(shiftX / realSquareSizeX);
+      if (!this.isScaleInPrc) {
+        const shiftX = e.offsetX - this.gc.x;
+        const realSquareSizeX = this.gc.width / this.cc.cols;
+        const shiftRectX = Math.floor(shiftX / realSquareSizeX);
 
-      const shiftY = e.offsetY - this.gc.y;
-      const realSquareSizeY = this.gc.height / this.cc.rows;
-      const shiftRectY = Math.floor(shiftY / realSquareSizeY);
-      const color = this.selectedColor;
+        const shiftY = e.offsetY - this.gc.y;
+        const realSquareSizeY = this.gc.height / this.cc.rows;
+        const shiftRectY = Math.floor(shiftY / realSquareSizeY);
+        const color = this.selectedColor;
 
-      if (!this.colorsOnCanvas.includes(color)) {
-        this.colorsOnCanvas.push(color);
-      }
+        if (!this.colorsOnCanvas.includes(color)) {
+          this.colorsOnCanvas.push(color);
+        }
 
-      const newRect = {
-        col: shiftRectX,
-        row: shiftRectY,
-      };
+        const newRect = {
+          col: shiftRectX,
+          row: shiftRectY,
+        };
 
-      const colorIndex = getColorIndexInRectList(this.rectList, color);
-      let isRectUnique = isRectUniqueFn(this.rectList, color, newRect);
+        console.log(this.rectList, 88);
 
-      if (isRectUnique) {
-        if (colorIndex == null) {
-          this.rectList.push({
-            color: color,
-            arr: [[newRect]],
-          });
+        const colorIndex = getColorIndexInRectList(this.rectList, color);
+        let isRectUnique = isRectUniqueFn(this.rectList, color, newRect);
 
-          this.rectListHistory.arr.push({
-            color,
-            arr: [newRect],
-            isHistory: false,
-          });
-        } else {
-          if (!this.beginMovePaint) {
-            this.rectList[colorIndex].arr.push([newRect]);
+        if (isRectUnique) {
+          if (colorIndex == null) {
+            this.rectList.push({
+              color: color,
+              arr: [[newRect]],
+            });
+
             this.rectListHistory.arr.push({
               color,
               arr: [newRect],
               isHistory: false,
             });
           } else {
-            this.rectList[colorIndex].arr.at(-1).push(newRect);
-            this.rectListHistory.arr.at(-1).arr.push(newRect);
+            if (!this.beginMovePaint) {
+              this.rectList[colorIndex].arr.push([newRect]);
+              this.rectListHistory.arr.push({
+                color,
+                arr: [newRect],
+                isHistory: false,
+              });
+            } else {
+              this.rectList[colorIndex].arr.at(-1).push(newRect);
+              this.rectListHistory.arr.at(-1).arr.push(newRect);
+            }
           }
         }
-      }
 
-      if (this.rectListHistory.arr.length > 5) {
-        this.rectListHistory.arr.shift();
-      }
+        if (this.rectListHistory.arr.length > 5) {
+          this.rectListHistory.arr.shift();
+        }
 
-      this.rectListHistory.arr = this.rectListHistory.arr.filter((el) => {
-        return !el.isHistory;
-      });
-      this.rectListHistory.cnt = this.rectListHistory.arr.length - 1;
-      const squareSize = this.cc.squareSize * this.cc.scale;
-      const x = this.gc.x + shiftRectX * squareSize;
-      const y = this.gc.y + shiftRectY * squareSize;
+        this.rectListHistory.arr = this.rectListHistory.arr.filter((el) => {
+          return !el.isHistory;
+        });
+        this.rectListHistory.cnt = this.rectListHistory.arr.length - 1;
+        const squareSize = this.cc.squareSize + this.cc.scale;
+        const x = this.gc.x + shiftRectX * squareSize;
+        const y = this.gc.y + shiftRectY * squareSize;
 
-      let imgd = this.ctx.getImageData(x + squareSize / 2 - 1, y + squareSize / 2 - 1, 1, 1);
-      console.log(imgd, `rgb(${imgd.data[0]}, ${imgd.data[1]}, ${imgd.data[2]})`, color, 777);
+        let imgd = this.ctx.getImageData(x, y, 1, 1);
+        // const clickColor = `rgb(${imgd.data[0]}, ${imgd.data[1]}, ${imgd.data[2]})`;
+        console.log(this, 777);
 
-      this.ctx.fillStyle = color;
-      this.ctx.fillRect(x, y, squareSize, squareSize);
+        this.ctx.fillStyle = color;
+        this.ctx.fillRect(x, y, squareSize, squareSize);
 
-      this.ctx.fillStyle = `rgb(${imgd.data[0]}, ${imgd.data[1]}, ${imgd.data[2]})`;
-      this.ctx.fillRect(300, 300, squareSize, squareSize);
-    },
-
-    initScale() {
-      const percentScale = 0.9;
-      const groupWidth = this.cc.cols * this.cc.squareSize;
-      const groupHeight = this.cc.rows * this.cc.squareSize;
-      let isNeedScaleWidth = false;
-
-      if (groupHeight > this.cc.width) {
-        this.cc.scale = (this.cc.width / groupWidth) * percentScale;
-        isNeedScaleWidth = true;
-      }
-
-      if (isNeedScaleWidth && groupHeight * this.cc.scale > this.cc.height) {
-        this.cc.scale = (this.cc.height / groupHeight) * percentScale;
-      } else if (!isNeedScaleWidth && groupHeight > this.cc.height) {
-        this.cc.scale = (this.cc.height / groupHeight) * percentScale;
+        this.ctx.fillStyle = `rgb(${imgd.data[0]}, ${imgd.data[1]}, ${imgd.data[2]})`;
+        this.ctx.fillRect(300, 300, squareSize, squareSize);
       }
     },
 
@@ -395,39 +398,51 @@ export default {
 
     setNewScale(direction) {
       const container = this.$refs.containerCanvas;
-      const oldScale = this.cc.scale;
-      const newScale = direction > 0 ? oldScale * this.cc.scaleBy : oldScale / this.cc.scaleBy;
-
-      const isCanScaleByUp = this.gc.width / this.cc.cols < this.cc.squareSize * 2;
-      const diffX = container.offsetWidth - this.gc.width;
-      const diffY = container.offsetHeight - this.gc.height;
-
-      let isCanScaleByDown = null;
-      if (
-        this.cc.cols * this.cc.squareSize < container.offsetWidth &&
-        this.cc.rows * this.cc.squareSize < container.offsetHeight
-      ) {
-        isCanScaleByDown =
-          diffX < diffY
-            ? this.gc.width > this.cc.cols * this.cc.squareSize
-            : this.gc.height > this.cc.rows * this.cc.squareSize;
-      } else {
-        isCanScaleByDown =
-          diffX < diffY ? this.gc.width > container.offsetWidth * 0.9 : this.gc.height > container.offsetHeight * 0.9;
-      }
-
-      if ((direction > 0 && isCanScaleByUp) || (direction < 0 && isCanScaleByDown)) {
+      const setValue = () => {
         this.cc.scale = newScale;
+        console.log(this.isScaleInPrc, this.cc.scale);
+        const newScquareSize = this.isScaleInPrc
+          ? this.cc.squareSize * this.cc.scale
+          : this.cc.squareSize + this.cc.scale;
         const oldWidth = this.gc.width;
         const oldHeight = this.gc.height;
-        this.gc.width = this.cc.cols * this.cc.squareSize * this.cc.scale;
-        this.gc.height = this.cc.rows * this.cc.squareSize * this.cc.scale;
-        this.scaleInPrc = Math.floor(((this.cc.squareSize * this.cc.scale) / this.cc.squareSize) * 100);
+        this.gc.width = this.cc.cols * newScquareSize;
+        this.gc.height = this.cc.rows * newScquareSize;
+        this.scaleInPrc = Math.floor((newScquareSize / this.cc.squareSize) * 100);
 
         this.gc.x -= (this.gc.width - oldWidth) / 2;
         this.gc.y -= (this.gc.height - oldHeight) / 2;
+      };
+
+      const oldScale = this.cc.scale;
+      let newScale = oldScale;
+      if (direction < 0 && !this.isScaleInPrc) {
+        if (oldScale == -19) {
+          const diffX = container.offsetWidth - this.gc.width;
+          const diffY = container.offsetHeight - this.gc.height;
+          if (diffX < 0 || diffY < 0) {
+            newScale =
+              diffX < diffY
+                ? (container.offsetWidth * 0.9) / this.cc.cols / this.cc.squareSize
+                : (container.offsetHeight * 0.9) / this.cc.rows / this.cc.squareSize;
+            this.isScaleInPrc = true;
+          }
+        }
+
+        if (oldScale > -19) {
+          newScale = oldScale - this.cc.scaleBy;
+        }
       }
 
+      if (direction > 0) {
+        if (this.isScaleInPrc) {
+          newScale = -19;
+          this.isScaleInPrc = false;
+        } else if (!this.isScaleInPrc && oldScale < 20) {
+          newScale = oldScale + this.cc.scaleBy;
+        }
+      }
+      setValue();
       this.leavePicOnCanvas();
     },
 
