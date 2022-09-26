@@ -27,17 +27,21 @@ import LeftSidebar from "@/components/blocks/LeftSidebar.vue";
 import ViewModeTooltip from "@/components/blocks/ViewModeTooltip.vue";
 /*
 проблемы канваса
-3. В массиве не заменяется квадрат на том же месте а просто добавляется
-4. Сделать удаление цвета из цветов на канвасе если их нет
+5. Рисовать ректлист и хистори рект лист. не хранить историю в рект лист
 
-5. при выходе мыши за канвас если рисовали то надо продолжать рисовать если перемещали то продолжать перемещать
-6. Переписать события из саййдбара без стора
+1. В массиве не заменяется квадрат на том же месте а просто добавляется
+2. Сделать удаление цвета из цветов на канвасе если их нет
+3. Рисовать квадрат при отпускании мыши
+4. Рисовать линии на другом канвасе
 
-7. попробовать переводить в рисунок часть картинки
-8. Подставлять вместо квадратов и линий картинку если меньше одного пикселя
-9. Рефаторинг
-== Улучшения ==
-сделать линии свг или на другом канвасе
+
+6. при выходе мыши за канвас если рисовали то надо продолжать рисовать если перемещали то продолжать перемещать
+7. Переписать события из саййдбара без стора
+
+8. попробовать переводить в рисунок часть картинки
+9. Подставлять вместо квадратов и линий картинку если меньше одного пикселя
+10. Рефаторинг
+11. Сохранять в локалсторадже
 */
 export default {
   components: {
@@ -249,7 +253,6 @@ export default {
     },
 
     drawRectList() {
-      // const date1 = Date.now();
       const squareSize = this.isScaleInPrc ? this.cc.squareSize * this.cc.scale : this.cc.squareSize + this.cc.scale;
       for (let i = 0; i < this.rectList.length; i++) {
         this.ctx.fillStyle = this.rectList[i].color;
@@ -261,8 +264,6 @@ export default {
           }
         }
       }
-      // const date2 = Date.now();
-      // console.log((date2 - date1) / 1000);
     },
 
     isSquareVisible(x, y, squareSize) {
@@ -274,28 +275,26 @@ export default {
 
     drawRect(e) {
       if (!this.isScaleInPrc) {
-        const shiftX = e.offsetX - this.gc.x;
-        const realSquareSizeX = this.gc.width / this.cc.cols;
-        const shiftRectX = Math.floor(shiftX / realSquareSizeX);
-
-        const shiftY = e.offsetY - this.gc.y;
-        const realSquareSizeY = this.gc.height / this.cc.rows;
-        const shiftRectY = Math.floor(shiftY / realSquareSizeY);
         const color = this.selectedColor;
 
         if (!this.colorsOnCanvas.includes(color)) {
           this.colorsOnCanvas.push(color);
         }
 
-        const newRect = {
-          col: shiftRectX,
-          row: shiftRectY,
-        };
-
-        console.log(this.rectList, 88);
-
+        const newRect = this.getRectCoords(e.offsetX, e.offsetY);
         const colorIndex = getColorIndexInRectList(this.rectList, color);
         let isRectUnique = isRectUniqueFn(this.rectList, color, newRect);
+
+        /*
+        надо проверить есть ли в массиве квадрат с таким цветом
+        если цвет совпадает с выбранным то просто игнорировать добавление
+        если не совпадает то удалять старый квадрат из массива и добавлять его в новый цвет
+        а как тогда восстановить прошлый цвет если он в истории?
+        получается надо рисовать историю а удалять и ректлист и сразу понятно что он 
+        не в истории и можно его спокойно удалить
+
+        рисуем ректлист и хисториректлист
+        */
 
         if (isRectUnique) {
           if (colorIndex == null) {
@@ -327,25 +326,45 @@ export default {
         if (this.rectListHistory.arr.length > 5) {
           this.rectListHistory.arr.shift();
         }
+        console.log(this.rectListHistory, 999);
 
         this.rectListHistory.arr = this.rectListHistory.arr.filter((el) => {
           return !el.isHistory;
         });
         this.rectListHistory.cnt = this.rectListHistory.arr.length - 1;
-        const squareSize = this.cc.squareSize + this.cc.scale;
-        const x = this.gc.x + shiftRectX * squareSize;
-        const y = this.gc.y + shiftRectY * squareSize;
 
-        let imgd = this.ctx.getImageData(x, y, 1, 1);
-        // const clickColor = `rgb(${imgd.data[0]}, ${imgd.data[1]}, ${imgd.data[2]})`;
-        console.log(this, 777);
-
-        this.ctx.fillStyle = color;
-        this.ctx.fillRect(x, y, squareSize, squareSize);
-
-        this.ctx.fillStyle = `rgb(${imgd.data[0]}, ${imgd.data[1]}, ${imgd.data[2]})`;
-        this.ctx.fillRect(300, 300, squareSize, squareSize);
+        this.drawRectOnCanvas(newRect);
       }
+    },
+
+    getRectCoords(offsetX, offsetY) {
+      const shiftX = offsetX - this.gc.x;
+      const realSquareSizeX = this.gc.width / this.cc.cols;
+      const shiftRectX = Math.floor(shiftX / realSquareSizeX);
+
+      const shiftY = offsetY - this.gc.y;
+      const realSquareSizeY = this.gc.height / this.cc.rows;
+      const shiftRectY = Math.floor(shiftY / realSquareSizeY);
+
+      return {
+        col: shiftRectX,
+        row: shiftRectY,
+      };
+    },
+
+    drawRectOnCanvas(newRect) {
+      const color = this.selectedColor;
+
+      const squareSize = this.cc.squareSize + this.cc.scale;
+      const x = this.gc.x + newRect.col * squareSize;
+      const y = this.gc.y + newRect.row * squareSize;
+
+      let imgd = this.ctx.getImageData(x, y, 1, 1);
+      this.ctx.fillStyle = color;
+      this.ctx.fillRect(x, y, squareSize, squareSize);
+
+      this.ctx.fillStyle = `rgb(${imgd.data[0]}, ${imgd.data[1]}, ${imgd.data[2]})`;
+      this.ctx.fillRect(300, 300, squareSize, squareSize);
     },
 
     handleCanvasEvent(e) {
