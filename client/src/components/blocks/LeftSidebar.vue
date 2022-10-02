@@ -218,7 +218,11 @@ export default {
     },
 
     chooseColor(e) {
-      this.drawingColor = e.cssColor;
+      let arr = e.cssColor.slice(e.cssColor.indexOf("(") + 1, e.cssColor.indexOf(")")).split(" ");
+      arr.forEach((el, i) => {
+        arr[i] = Math.floor(el);
+      });
+      this.drawingColor = `rgb(${arr.join(", ")})`;
     },
 
     chooseColorForReplace(e) {

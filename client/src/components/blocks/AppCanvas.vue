@@ -1,9 +1,11 @@
 <template>
   <div>
     <div class="container-canvas" ref="containerCanvas">
+      <canvas id="cl" ref="cl" class="canvas"></canvas>
       <canvas
         id="c"
         ref="c"
+        class="canvas"
         @mousewheel="handleMouseWheel"
         @mousedown="handleCanvasEvent"
         @mouseup="handleCanvasEvent"
@@ -22,26 +24,19 @@
 
 <script>
 import { mapGetters } from "vuex";
-import { getColorIndexInRectList, isRectUniqueFn } from "@/assets/js/utilsCanvas.js";
+import { getColorIndexInRectList } from "@/assets/js/utilsCanvas.js";
 import LeftSidebar from "@/components/blocks/LeftSidebar.vue";
 import ViewModeTooltip from "@/components/blocks/ViewModeTooltip.vue";
 /*
 проблемы канваса
-5. Рисовать ректлист и хистори рект лист. не хранить историю в рект лист
-
-1. В массиве не заменяется квадрат на том же месте а просто добавляется
-2. Сделать удаление цвета из цветов на канвасе если их нет
-3. Рисовать квадрат при отпускании мыши
-4. Рисовать линии на другом канвасе
-
-
-6. при выходе мыши за канвас если рисовали то надо продолжать рисовать если перемещали то продолжать перемещать
-7. Переписать события из саййдбара без стора
-
-8. попробовать переводить в рисунок часть картинки
-9. Подставлять вместо квадратов и линий картинку если меньше одного пикселя
-10. Рефаторинг
-11. Сохранять в локалсторадже
+1. Рисовать квадрат при отпускании мыши
+2. при выходе мыши за канвас если рисовали то надо продолжать рисовать если перемещали то продолжать перемещать
+3. Делать события мобилы
+4. Делать адаптив
+5. попробовать переводить в рисунок часть картинки
+6. Подставлять вместо квадратов и линий картинку если меньше одного пикселя
+7. Рефаторинг - Переписать события из саййдбара без стора
+8. Сохранять в локалсторадже
 */
 export default {
   components: {
@@ -52,7 +47,9 @@ export default {
   data() {
     return {
       canvas: null,
+      canvasL: null,
       ctx: null,
+      ctxL: null,
       cc: {
         width: 0,
         height: 0,
@@ -100,8 +97,7 @@ export default {
         this.rectList = [];
         this.cc.cols = val.value[0];
         this.cc.rows = val.value[1];
-
-        this.changeSizeCanvas();
+        this.$store.dispatch("setCanvasClean", true);
       },
       deep: true,
     },
@@ -110,6 +106,7 @@ export default {
       if (val) {
         this.rectList = [];
         this.rectListHistory = { cnt: 0, arr: [] };
+        this.colorsOnCanvas = [];
         this.changeSizeCanvas();
         this.$store.dispatch("setCanvasClean", false);
       }
@@ -119,12 +116,6 @@ export default {
       if (val && this.rectListHistory.arr.length && !this.rectListHistory.arr[0].isHistory) {
         const index = this.rectListHistory.cnt;
         this.rectListHistory.arr[index].isHistory = true;
-        for (let i = 0; i < this.rectList.length; i++) {
-          if (this.rectList[i].color == this.rectListHistory.arr[index].color) {
-            this.rectList[i].arr.pop();
-          }
-        }
-
         this.rectListHistory.cnt--;
       }
 
@@ -138,12 +129,6 @@ export default {
 
         if (this.rectListHistory.arr.length) {
           this.rectListHistory.arr[index].isHistory = false;
-
-          for (let i = 0; i < this.rectList.length; i++) {
-            if (this.rectList[i].color == this.rectListHistory.arr[index].color) {
-              this.rectList[i].arr.push(this.rectListHistory.arr[index].arr);
-            }
-          }
         }
       }
       this.$store.dispatch("returnFromHistoryList", false);
@@ -179,12 +164,16 @@ export default {
       if (firstInit) {
         this.canvas = this.$refs.c;
         this.ctx = this.canvas.getContext("2d");
+        this.canvasL = this.$refs.cl;
+        this.ctxL = this.canvasL.getContext("2d");
       }
       const container = this.$refs.containerCanvas;
       this.cc.width = container?.offsetWidth || this.cc.width;
       this.cc.height = container?.offsetHeight || this.cc.height;
       this.canvas.width = container?.offsetWidth || this.canvas.width;
       this.canvas.height = container?.offsetHeight || this.canvas.height;
+      this.canvasL.width = container?.offsetWidth || this.canvasL.width;
+      this.canvasL.height = container?.offsetHeight || this.canvasL.height;
     },
 
     initScale() {
@@ -227,29 +216,29 @@ export default {
     },
 
     drawGroup() {
-      this.ctx.strokeStyle = "rgba(0, 0, 0, 1)";
-      this.ctx.fillStyle = "rgba(255, 255, 255, 1)";
-      this.ctx.lineWidth = 1;
-      this.ctx.fillRect(this.gc.x, this.gc.y, this.gc.width, this.gc.height);
-      this.ctx.strokeRect(this.gc.x, this.gc.y, this.gc.width, this.gc.height);
+      this.ctxL.strokeStyle = "rgba(0, 0, 0, 1)";
+      this.ctxL.fillStyle = "rgba(255, 255, 255, 1)";
+      this.ctxL.lineWidth = 1;
+      this.ctxL.fillRect(this.gc.x, this.gc.y, this.gc.width, this.gc.height);
+      this.ctxL.strokeRect(this.gc.x, this.gc.y, this.gc.width, this.gc.height);
     },
 
     drawLines() {
       const squareSize = this.isScaleInPrc ? this.cc.squareSize * this.cc.scale : this.cc.squareSize + this.cc.scale;
-      this.ctx.beginPath();
+      this.ctxL.beginPath();
       for (let i = 0; i < this.cc.rows + 1; i++) {
-        this.ctx.moveTo(this.gc.x, this.gc.y + i * squareSize);
-        this.ctx.lineTo(this.gc.x + this.gc.width, this.gc.y + i * squareSize);
+        this.ctxL.moveTo(this.gc.x, this.gc.y + i * squareSize);
+        this.ctxL.lineTo(this.gc.x + this.gc.width, this.gc.y + i * squareSize);
       }
 
       for (let i = 0; i < this.cc.cols + 1; i++) {
-        this.ctx.moveTo(this.gc.x + i * squareSize, this.gc.y);
-        this.ctx.lineTo(this.gc.x + i * squareSize, this.gc.y + this.gc.height);
+        this.ctxL.moveTo(this.gc.x + i * squareSize, this.gc.y);
+        this.ctxL.lineTo(this.gc.x + i * squareSize, this.gc.y + this.gc.height);
       }
 
-      this.ctx.strokeStyle = "#000";
-      this.ctx.lineWidth = squareSize / 20;
-      this.ctx.stroke();
+      this.ctxL.strokeStyle = "#000";
+      this.ctxL.lineWidth = squareSize / 20;
+      this.ctxL.stroke();
     },
 
     drawRectList() {
@@ -257,9 +246,18 @@ export default {
       for (let i = 0; i < this.rectList.length; i++) {
         this.ctx.fillStyle = this.rectList[i].color;
         for (let j = 0; j < this.rectList[i].arr.length; j++) {
-          for (let k = 0; k < this.rectList[i].arr[j].length; k++) {
-            const x = this.gc.x + this.rectList[i].arr[j][k].col * squareSize;
-            const y = this.gc.y + this.rectList[i].arr[j][k].row * squareSize;
+          const x = this.gc.x + this.rectList[i].arr[j].col * squareSize;
+          const y = this.gc.y + this.rectList[i].arr[j].row * squareSize;
+          if (this.isSquareVisible(x, y, squareSize)) this.ctx.fillRect(x, y, squareSize, squareSize);
+        }
+      }
+
+      for (let i = 0; i < this.rectListHistory.arr.length; i++) {
+        if (!this.rectListHistory.arr[i].isHistory) {
+          this.ctx.fillStyle = this.rectListHistory.arr[i].color;
+          for (let j = 0; j < this.rectListHistory.arr[i].arr.length; j++) {
+            const x = this.gc.x + this.rectListHistory.arr[i].arr[j].col * squareSize;
+            const y = this.gc.y + this.rectListHistory.arr[i].arr[j].row * squareSize;
             if (this.isSquareVisible(x, y, squareSize)) this.ctx.fillRect(x, y, squareSize, squareSize);
           }
         }
@@ -276,57 +274,59 @@ export default {
     drawRect(e) {
       if (!this.isScaleInPrc) {
         const color = this.selectedColor;
-
         if (!this.colorsOnCanvas.includes(color)) {
           this.colorsOnCanvas.push(color);
         }
 
         const newRect = this.getRectCoords(e.offsetX, e.offsetY);
-        const colorIndex = getColorIndexInRectList(this.rectList, color);
-        let isRectUnique = isRectUniqueFn(this.rectList, color, newRect);
+        const squareSize = this.cc.squareSize + this.cc.scale;
 
-        /*
-        надо проверить есть ли в массиве квадрат с таким цветом
-        если цвет совпадает с выбранным то просто игнорировать добавление
-        если не совпадает то удалять старый квадрат из массива и добавлять его в новый цвет
-        а как тогда восстановить прошлый цвет если он в истории?
-        получается надо рисовать историю а удалять и ректлист и сразу понятно что он 
-        не в истории и можно его спокойно удалить
+        const x = this.gc.x + newRect.col * squareSize;
+        const y = this.gc.y + newRect.row * squareSize;
+        let imgd = this.ctx.getImageData(x, y, 1, 1);
+        const colorOnCanvas = `rgb(${imgd.data[0]}, ${imgd.data[1]}, ${imgd.data[2]})`;
+        if (colorOnCanvas !== "rgb(0, 0, 0)" && colorOnCanvas !== color) {
+          newRect.prevColor = colorOnCanvas;
+        }
 
-        рисуем ректлист и хисториректлист
-        */
-
-        if (isRectUnique) {
-          if (colorIndex == null) {
-            this.rectList.push({
-              color: color,
-              arr: [[newRect]],
-            });
-
+        if (colorOnCanvas !== color) {
+          if (!this.beginMovePaint) {
             this.rectListHistory.arr.push({
               color,
               arr: [newRect],
               isHistory: false,
             });
           } else {
-            if (!this.beginMovePaint) {
-              this.rectList[colorIndex].arr.push([newRect]);
-              this.rectListHistory.arr.push({
-                color,
-                arr: [newRect],
-                isHistory: false,
-              });
-            } else {
-              this.rectList[colorIndex].arr.at(-1).push(newRect);
-              this.rectListHistory.arr.at(-1).arr.push(newRect);
-            }
+            this.rectListHistory.arr.at(-1).arr.push(newRect);
           }
         }
 
         if (this.rectListHistory.arr.length > 5) {
+          const colorIndex = getColorIndexInRectList(this.rectList, this.rectListHistory.arr[0].color);
+          if (colorIndex == null) {
+            this.rectList.push({
+              color: this.rectListHistory.arr[0].color,
+              arr: [...this.rectListHistory.arr[0].arr],
+            });
+          } else {
+            this.rectList[colorIndex].arr.push(...this.rectListHistory.arr[0].arr);
+          }
+
+          this.rectListHistory.arr[0].arr.forEach((hEl) => {
+            if (hEl.prevColor) {
+              this.rectList.forEach((rEl, i) => {
+                if (hEl.prevColor === rEl.color) {
+                  this.rectList[i].arr = rEl.arr.filter((item) => {
+                    return JSON.stringify({ col: hEl.col, row: hEl.row }) !== JSON.stringify(item);
+                  });
+                }
+              });
+            }
+          });
           this.rectListHistory.arr.shift();
         }
-        console.log(this.rectListHistory, 999);
+        const rectList = this.rectList.filter((el) => el.arr.length);
+        this.rectList = rectList;
 
         this.rectListHistory.arr = this.rectListHistory.arr.filter((el) => {
           return !el.isHistory;
@@ -384,8 +384,8 @@ export default {
             this.gc.y = e.offsetY - this.cc.shiftY;
             this.leavePicOnCanvas();
           } else {
-            this.drawRect(e);
             if (!this.beginMovePaint) this.beginMovePaint = true;
+            this.drawRect(e);
           }
         }
 
@@ -419,7 +419,6 @@ export default {
       const container = this.$refs.containerCanvas;
       const setValue = () => {
         this.cc.scale = newScale;
-        console.log(this.isScaleInPrc, this.cc.scale);
         const newScquareSize = this.isScaleInPrc
           ? this.cc.squareSize * this.cc.scale
           : this.cc.squareSize + this.cc.scale;
@@ -488,6 +487,7 @@ export default {
 
     clearCanvas() {
       this.ctx.clearRect(0, 0, this.cc.width, this.cc.height);
+      this.ctxL.clearRect(0, 0, this.cc.width, this.cc.height);
     },
 
     isAreaGroup(e) {
@@ -526,5 +526,11 @@ export default {
   width: 100%;
   height: 100vh;
   background: rgb(230, 230, 230);
+
+  .canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
 }
 </style>
