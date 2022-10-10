@@ -78,7 +78,7 @@ export default {
       isDragging: true,
       timer: null,
       beginMovePaint: false,
-      rectListHistory: { cnt: 0, arr: [] },
+      rectListHistory: { cnt: 0, actions: [] },
       scaleInPrc: 0,
       isScaleInPrc: false,
       colorsOnCanvas: [],
@@ -108,7 +108,7 @@ export default {
     "$store.state.isCanvasClean": function (val) {
       if (val) {
         this.rectList = [];
-        this.rectListHistory = { cnt: 0, arr: [] };
+        this.rectListHistory = { cnt: 0, actions: [] };
         this.colorsOnCanvas = [];
         this.changeSizeCanvas();
         this.$store.dispatch("setCanvasClean", false);
@@ -116,9 +116,9 @@ export default {
     },
 
     "$store.state.isUndoLastAction": function (val) {
-      if (val && this.rectListHistory.arr.length && !this.rectListHistory.arr[0].isHistory) {
+      if (val && this.rectListHistory.actions.length && !this.rectListHistory.actions[0].isHistory) {
         const index = this.rectListHistory.cnt;
-        this.rectListHistory.arr[index].isHistory = true;
+        this.rectListHistory.actions[index].isHistory = true;
         this.rectListHistory.cnt--;
       }
 
@@ -126,12 +126,12 @@ export default {
     },
 
     "$store.state.isReturnFromHistoryList": function (val) {
-      if (val && this.rectListHistory.arr.at(-1).isHistory) {
+      if (val && this.rectListHistory.actions.at(-1).isHistory) {
         this.rectListHistory.cnt++;
         const index = this.rectListHistory.cnt;
 
-        if (this.rectListHistory.arr.length) {
-          this.rectListHistory.arr[index].isHistory = false;
+        if (this.rectListHistory.actions.length) {
+          this.rectListHistory.actions[index].isHistory = false;
         }
       }
       this.$store.dispatch("returnFromHistoryList", false);
@@ -246,22 +246,25 @@ export default {
 
     drawRectList() {
       const squareSize = this.isScaleInPrc ? this.cc.squareSize * this.cc.scale : this.cc.squareSize + this.cc.scale;
+
       for (let i = 0; i < this.rectList.length; i++) {
         this.ctx.fillStyle = this.rectList[i].color;
-        for (let j = 0; j < this.rectList[i].arr.length; j++) {
-          const x = this.gc.x + this.rectList[i].arr[j].col * squareSize;
-          const y = this.gc.y + this.rectList[i].arr[j].row * squareSize;
+        for (let rect in this.rectList[i].rects) {
+          const x = this.gc.x + this.rectList[i].rects[rect].col * squareSize;
+          const y = this.gc.y + this.rectList[i].rects[rect].row * squareSize;
           if (this.isSquareVisible(x, y, squareSize)) this.ctx.fillRect(x, y, squareSize, squareSize);
         }
       }
 
-      for (let i = 0; i < this.rectListHistory.arr.length; i++) {
-        if (!this.rectListHistory.arr[i].isHistory) {
-          this.ctx.fillStyle = this.rectListHistory.arr[i].color;
-          for (let j = 0; j < this.rectListHistory.arr[i].arr.length; j++) {
-            const x = this.gc.x + this.rectListHistory.arr[i].arr[j].col * squareSize;
-            const y = this.gc.y + this.rectListHistory.arr[i].arr[j].row * squareSize;
-            if (this.isSquareVisible(x, y, squareSize)) this.ctx.fillRect(x, y, squareSize, squareSize);
+      for (let i = 0; i < this.rectListHistory.actions.length; i++) {
+        if (!this.rectListHistory.actions[i].isHistory) {
+          this.ctx.fillStyle = this.rectListHistory.actions[i].color;
+          for (let rect in this.rectListHistory.actions[i].rects) {
+            const x = this.gc.x + this.rectListHistory.actions[i].rects[rect].col * squareSize;
+            const y = this.gc.y + this.rectListHistory.actions[i].rects[rect].row * squareSize;
+            if (this.isSquareVisible(x, y, squareSize)) {
+              this.ctx.fillRect(x, y, squareSize, squareSize);
+            }
           }
         }
       }
@@ -282,6 +285,7 @@ export default {
         }
 
         const newRect = this.getRectCoords(e.offsetX, e.offsetY);
+        const idx = `x:${newRect.col}y:${newRect.row}`;
         const squareSize = this.cc.squareSize + this.cc.scale;
 
         const x = this.gc.x + newRect.col * squareSize;
@@ -294,47 +298,49 @@ export default {
 
         if (colorOnCanvas !== color) {
           if (!this.beginMovePaint) {
-            this.rectListHistory.arr.push({
+            this.rectListHistory.actions.push({
               color,
-              arr: [newRect],
+              rects: { [idx]: newRect },
               isHistory: false,
             });
           } else {
-            this.rectListHistory.arr.at(-1).arr.push(newRect);
+            this.rectListHistory.actions.at(-1).rects[idx] = newRect;
           }
         }
+        console.log(this.rectList, this.rectListHistory.actions, 888);
 
-        if (this.rectListHistory.arr.length > 5) {
-          const colorIndex = getColorIndexInRectList(this.rectList, this.rectListHistory.arr[0].color);
+        if (this.rectListHistory.actions.length > 5) {
+          const colorIndex = getColorIndexInRectList(this.rectList, this.rectListHistory.actions[0].color);
           if (colorIndex == null) {
             this.rectList.push({
-              color: this.rectListHistory.arr[0].color,
-              arr: [...this.rectListHistory.arr[0].arr],
+              color: this.rectListHistory.actions[0].color,
+              rects: { ...this.rectListHistory.actions[0].rects },
             });
           } else {
-            this.rectList[colorIndex].arr.push(...this.rectListHistory.arr[0].arr);
+            this.rectList[colorIndex].rects = {
+              ...this.rectList[colorIndex].rects,
+              ...this.rectListHistory.actions[0].rects,
+            };
           }
-
-          this.rectListHistory.arr[0].arr.forEach((hEl) => {
-            if (hEl.prevColor) {
+          for (let rect in this.rectListHistory.actions[0].rects) {
+            const prevColor = this.rectListHistory.actions[0].rects[rect].prevColor;
+            if (prevColor) {
               this.rectList.forEach((rEl, i) => {
-                if (hEl.prevColor === rEl.color) {
-                  this.rectList[i].arr = rEl.arr.filter((item) => {
-                    return JSON.stringify({ col: hEl.col, row: hEl.row }) !== JSON.stringify(item);
-                  });
+                if (prevColor === rEl.color) {
+                  delete this.rectList[i].rects[rect];
                 }
               });
             }
-          });
-          this.rectListHistory.arr.shift();
+          }
+          this.rectListHistory.actions.shift();
         }
-        const rectList = this.rectList.filter((el) => el.arr.length);
+        const rectList = this.rectList.filter((el) => Object.keys(el.rects).length);
         this.rectList = rectList;
 
-        this.rectListHistory.arr = this.rectListHistory.arr.filter((el) => {
+        this.rectListHistory.actions = this.rectListHistory.actions.filter((el) => {
           return !el.isHistory;
         });
-        this.rectListHistory.cnt = this.rectListHistory.arr.length - 1;
+        this.rectListHistory.cnt = this.rectListHistory.actions.length - 1;
 
         this.drawRectOnCanvas(newRect);
       }
@@ -393,6 +399,10 @@ export default {
         }
 
         if (e.type === "mouseup") {
+          if (!this.isDragging && this.beginMovePaint) {
+            this.drawRect(e);
+          }
+          console.log(this.cc.isClick, this.isDragging, this.beginMovePaint, 11);
           this.cc.isClick = false;
           this.timeoutDragStop();
           this.isDragging = true;
@@ -515,9 +525,9 @@ export default {
         }
       }
 
-      for (let i = 0; i < this.rectListHistory.arr.length; i++) {
-        if (this.rectListHistory.arr[i].color == oldColor) {
-          this.rectListHistory.arr[i].color = newColor;
+      for (let i = 0; i < this.rectListHistory.actions.length; i++) {
+        if (this.rectListHistory.actions[i].color == oldColor) {
+          this.rectListHistory.actions[i].color = newColor;
         }
       }
     },
