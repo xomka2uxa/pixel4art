@@ -28,18 +28,20 @@ import { getColorIndexInRectList } from "@/assets/js/utilsCanvas.js";
 import LeftSidebar from "@/components/blocks/LeftSidebar.vue";
 import ViewModeTooltip from "@/components/blocks/ViewModeTooltip.vue";
 /*
-проблемы канваса
-1. Рисовать квадрат при отпускании мыши
-1. Не перерисовывать если не скейлю и не перетаскиваю.
-2. при выходе мыши за канвас если рисовали то надо продолжать рисовать если перемещали то продолжать перемещать
-3. Сделать историю изменения цвета. Замена цвета в хистори
-3. Удалить использованные цвета если такого цвета нет на канвасе
-3. Делать события мобилы
+Задачи
+3. События мобилы
 4. Делать адаптив
 5. попробовать переводить в рисунок часть картинки
 6. Подставлять вместо квадратов и линий картинку если меньше одного пикселя
-7. Рефаторинг - Переписать события из саййдбара без стора
 8. Сохранять в локалсторадже
+
+Дебаггинг и рефакторинг - 
+1.Переписать события из саййдбара без стора Не перерисовывать если не скейлю и не перетаскиваю.
+2. Переписать кучи переменных которые я ввел для отслеживания событий
+3. Вынести функции расчетов за компонент.
+4. при выходе мыши за канвас если рисовали то надо продолжать рисовать если перемещали то продолжать перемещать
+5. Использованные цвета сразу выводить в палитру
+6. на мобиле масштабирование сделать по пальцам
 */
 export default {
   components: {
@@ -76,12 +78,14 @@ export default {
       rectList: [],
       isClick: false,
       isDragging: true,
+      isBeginMove: false,
       timer: null,
       beginMovePaint: false,
       rectListHistory: { cnt: 0, actions: [] },
       scaleInPrc: 0,
       isScaleInPrc: false,
       colorsOnCanvas: [],
+      drawRectXY: { x: 0, y: 0 },
     };
   },
 
@@ -92,6 +96,9 @@ export default {
     this.initCanvas();
     this.changeSizeCanvas();
     this.draw();
+    this.$refs.c.addEventListener("touchstart", this.handleCanvasEventTouchStart, false);
+    this.$refs.c.addEventListener("touchmove", this.handleCanvasEventTouchMove, false);
+    this.$refs.c.addEventListener("touchend", this.handleCanvasEventTouchEnd, false);
   },
 
   watch: {
@@ -126,7 +133,7 @@ export default {
     },
 
     "$store.state.isReturnFromHistoryList": function (val) {
-      if (val && this.rectListHistory.actions.at(-1).isHistory) {
+      if (val && this.rectListHistory.actions.at(-1)?.isHistory) {
         this.rectListHistory.cnt++;
         const index = this.rectListHistory.cnt;
 
@@ -139,7 +146,14 @@ export default {
   },
 
   computed: {
-    ...mapGetters(["selectedColor", "selectedSizePaint", "isCanvasClean", "cntHistoryAction", "historyMode"]),
+    ...mapGetters([
+      "selectedColor",
+      "selectedSizePaint",
+      "isCanvasClean",
+      "colorPallete",
+      "cntHistoryAction",
+      "historyMode",
+    ]),
   },
 
   methods: {
@@ -277,14 +291,17 @@ export default {
       return false;
     },
 
-    drawRect(e) {
+    drawRect(x, y) {
+      console.log(11);
+      let lx = x;
+      let ly = y;
       if (!this.isScaleInPrc) {
         const color = this.selectedColor;
         if (!this.colorsOnCanvas.includes(color)) {
           this.colorsOnCanvas.push(color);
         }
 
-        const newRect = this.getRectCoords(e.offsetX, e.offsetY);
+        const newRect = this.getRectCoords(lx, ly);
         const idx = `x:${newRect.col}y:${newRect.row}`;
         const squareSize = this.cc.squareSize + this.cc.scale;
 
@@ -307,7 +324,6 @@ export default {
             this.rectListHistory.actions.at(-1).rects[idx] = newRect;
           }
         }
-        console.log(this.rectList, this.rectListHistory.actions, 888);
 
         if (this.rectListHistory.actions.length > 5) {
           const colorIndex = getColorIndexInRectList(this.rectList, this.rectListHistory.actions[0].color);
@@ -333,9 +349,19 @@ export default {
             }
           }
           this.rectListHistory.actions.shift();
+          let deleteColorFromCanvasOnColors = "";
+          const rectList = this.rectList.filter((el) => {
+            if (!Object.keys(el.rects).length) {
+              deleteColorFromCanvasOnColors = el.color;
+              return false;
+            }
+            return true;
+          });
+          if (deleteColorFromCanvasOnColors) {
+            this.colorsOnCanvas = this.colorsOnCanvas.filter((el) => deleteColorFromCanvasOnColors != el);
+          }
+          this.rectList = rectList;
         }
-        const rectList = this.rectList.filter((el) => Object.keys(el.rects).length);
-        this.rectList = rectList;
 
         this.rectListHistory.actions = this.rectListHistory.actions.filter((el) => {
           return !el.isHistory;
@@ -376,37 +402,93 @@ export default {
       this.ctx.fillRect(300, 300, squareSize, squareSize);
     },
 
+    handleCanvasEventTouchStart(e) {
+      e.preventDefault();
+      this.drawRectXY.x = Math.floor(e.touches[0].pageX);
+      this.drawRectXY.y = Math.floor(e.touches[0].pageY);
+      const areaGroup = this.isAreaGroup(this.drawRectXY.x, this.drawRectXY.y);
+
+      if (areaGroup) {
+        this.isBeginMove = true;
+        this.cc.isClick = true;
+        this.timeoutDragStart(this.drawRectXY.x, this.drawRectXY.y);
+
+        this.cc.shiftX = this.drawRectXY.x - this.gc.x;
+        this.cc.shiftY = this.drawRectXY.y - this.gc.y;
+      }
+    },
+
+    handleCanvasEventTouchMove(e) {
+      console.log(e);
+      e.preventDefault();
+      let x = Math.floor(e.touches[0].pageX);
+      let y = Math.floor(e.touches[0].pageY);
+      const areaGroup = this.isAreaGroup(x, y);
+      if (areaGroup) {
+        this.timeoutDragStop();
+        this.isBeginMove = false;
+        if (this.isDragging) {
+          this.gc.x = x - this.cc.shiftX;
+          this.gc.y = y - this.cc.shiftY;
+          this.leavePicOnCanvas();
+        } else {
+          if (!this.beginMovePaint) this.beginMovePaint = true;
+          this.drawRect(x, y);
+        }
+      }
+    },
+
+    handleCanvasEventTouchEnd() {
+      const areaGroup = this.isAreaGroup(Math.floor(this.drawRectXY.x), Math.floor(this.drawRectXY.y));
+      if (areaGroup) {
+        if (this.isBeginMove) {
+          this.drawRect(this.drawRectXY.x, this.drawRectXY.y);
+        }
+        this.cc.isClick = false;
+        this.timeoutDragStop();
+        this.isDragging = true;
+        this.beginMovePaint = false;
+        this.isBeginMove = false;
+      }
+    },
+
     handleCanvasEvent(e) {
-      const areaGroup = this.isAreaGroup(e);
+      console.log(e.type);
+      const areaGroup = this.isAreaGroup(e.offsetX, e.offsetY);
       if (areaGroup) {
         if (e.type === "mousedown") {
+          this.isBeginMove = true;
           this.cc.isClick = true;
-          this.timeoutDragStart(e);
-          this.cc.shiftX = e.offsetX - this.gc.x;
-          this.cc.shiftY = e.offsetY - this.gc.y;
+          this.timeoutDragStart(e.offsetX, e.offsetY);
+          let offsetX = e.offsetX;
+          let offsetY = e.offsetY;
+
+          this.cc.shiftX = offsetX - this.gc.x;
+          this.cc.shiftY = offsetY - this.gc.y;
         }
 
         if (e.type === "mousemove" && this.cc.isClick) {
           this.timeoutDragStop();
+          this.isBeginMove = false;
           if (this.isDragging) {
             this.gc.x = e.offsetX - this.cc.shiftX;
             this.gc.y = e.offsetY - this.cc.shiftY;
             this.leavePicOnCanvas();
           } else {
             if (!this.beginMovePaint) this.beginMovePaint = true;
-            this.drawRect(e);
+            this.drawRect(e.offsetX, e.offsetY);
           }
         }
 
         if (e.type === "mouseup") {
-          if (!this.isDragging && this.beginMovePaint) {
-            this.drawRect(e);
+          if (this.isBeginMove) {
+            this.drawRect(e.offsetX, e.offsetY);
           }
-          console.log(this.cc.isClick, this.isDragging, this.beginMovePaint, 11);
           this.cc.isClick = false;
           this.timeoutDragStop();
           this.isDragging = true;
           this.beginMovePaint = false;
+          this.isBeginMove = false;
         }
       } else {
         this.cc.isClick = false;
@@ -417,7 +499,7 @@ export default {
     },
 
     handleMouseWheel(e) {
-      if (this.isAreaGroup(e)) {
+      if (this.isAreaGroup(e.offsetX, e.offsetY)) {
         e.preventDefault();
         const direction = e.deltaY > 0 ? -1 : 1;
         this.setNewScale(direction);
@@ -484,11 +566,11 @@ export default {
       if (this.gc.y > this.cc.height - 50) this.gc.y = this.cc.height - 70;
     },
 
-    timeoutDragStart(e) {
+    timeoutDragStart(x, y) {
       const isDrag = () => {
         this.isDragging = false;
 
-        this.drawRect(e);
+        this.drawRect(x, y);
       };
 
       this.timer = setTimeout(isDrag, 100);
@@ -503,13 +585,8 @@ export default {
       this.ctxL.clearRect(0, 0, this.cc.width, this.cc.height);
     },
 
-    isAreaGroup(e) {
-      return (
-        e.offsetX > this.gc.x &&
-        e.offsetX < this.gc.x + this.gc.width &&
-        e.offsetY > this.gc.y &&
-        e.offsetY < this.gc.y + this.gc.height
-      );
+    isAreaGroup(x, y) {
+      return x > this.gc.x && x < this.gc.x + this.gc.width && y > this.gc.y && y < this.gc.y + this.gc.height;
     },
 
     replaceColorOnCanvas({ oldColor, newColor }) {
