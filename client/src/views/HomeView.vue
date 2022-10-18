@@ -1,23 +1,17 @@
 <template>
   <div class="main">
     <first-main-app />
-    <tabs-screen-app />
-    <posts-app />
   </div>
 </template>
 
 <script>
 import FirstMainApp from "@/components/main/FirstMainApp.vue";
-import TabsScreenApp from "/components/main/TabsScreenApp.vue";
-import PostsApp from "@/components/main/PostsApp.vue";
 
 export default {
   name: "HomeView",
 
   components: {
     FirstMainApp,
-    TabsScreenApp,
-    PostsApp,
   },
 
   mounted() {
@@ -28,8 +22,4 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-.main {
-  margin-bottom: 120px;
-}
-</style>
+<style lang="scss" scoped></style>

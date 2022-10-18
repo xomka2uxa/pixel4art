@@ -2,19 +2,16 @@
   <div :class="['header-nav-wrapper', isOpenMenu ? 'open' : '']">
     <menu-close @close="$emit('close')" />
     <header-nav />
-    <header-socials />
   </div>
 </template>
 
 <script>
 import MenuClose from "@/components/default/header-app/MenuClose.vue";
 import HeaderNav from "@/components/default/header-app/HeaderNav.vue";
-import HeaderSocials from "@/components/default/header-app/HeaderSocials.vue";
 
 export default {
   components: {
     MenuClose,
-    HeaderSocials,
     HeaderNav,
   },
 
