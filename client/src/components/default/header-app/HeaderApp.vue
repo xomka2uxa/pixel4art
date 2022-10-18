@@ -14,6 +14,7 @@
             <header-logo />
             <header-burger @open="openMenuToggle" />
             <header-nav-wrapper :is-open-menu="isOpenMenu" @close="openMenuToggle" />
+            <header-socials />
           </div>
         </div>
       </div>
@@ -34,6 +35,7 @@ import HeaderLogo from "@/components/default/header-app/HeaderLogo.vue";
 import HeaderBurger from "@/components/default/header-app/HeaderBurger.vue";
 import HeaderNavWrapper from "@/components/default/header-app/HeaderNavWrapper.vue";
 import HeaderOpen from "@/components/default/header-app/HeaderOpen.vue";
+import HeaderSocials from "@/components/default/header-app/HeaderSocials.vue";
 
 export default {
   inject: ["mq"],
@@ -50,6 +52,7 @@ export default {
     HeaderNavWrapper,
     HeaderTop,
     HeaderOpen,
+    HeaderSocials,
   },
 
   computed: {
