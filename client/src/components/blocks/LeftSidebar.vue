@@ -172,6 +172,8 @@ import Popper from "vue3-popper";
 import { ColorPicker } from "vue-accessible-color-picker";
 
 export default {
+  inject: ["mq"],
+
   components: {
     Popper,
     ColorPicker,

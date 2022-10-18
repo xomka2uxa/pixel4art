@@ -1,7 +1,10 @@
 <template>
   <div
     class="header"
-    :class="{ _transparent: isHeaderTransparent, _hidden: isHeaderHidden, _hideMobile: isHeaderHiddenMobile }"
+    :class="{
+      _transparent: isHeaderTransparent,
+      _hidden: isHeaderHidden || (isHeaderHiddenMobile && !mq.xlPlus),
+    }"
   >
     <div class="header__inner">
       <header-top />
@@ -17,7 +20,7 @@
     </div>
     <header-open
       class="__open-btn"
-      :is-header-hidden="isHeaderHidden"
+      :is-header-hidden="isHeaderHidden && mq.xlPlus"
       @click="$store.dispatch('header/toggleHeaderHidden')"
     />
   </div>
@@ -33,6 +36,8 @@ import HeaderNavWrapper from "@/components/default/header-app/HeaderNavWrapper.v
 import HeaderOpen from "@/components/default/header-app/HeaderOpen.vue";
 
 export default {
+  inject: ["mq"],
+
   data() {
     return {
       isOpenMenu: false,
@@ -105,12 +110,6 @@ export default {
 }
 
 ._hidden {
-  .header__inner {
-    transform: translateY(-115px);
-  }
-}
-
-._hideMobile {
   .header__inner {
     transform: translateY(-115px);
   }

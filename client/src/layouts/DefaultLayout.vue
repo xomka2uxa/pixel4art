@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper">
-    привет {{ mq }}
+    привет {{ mq.xlPlus }}
     <header-app />
     <slot />
     <footer-app />

@@ -15,7 +15,16 @@ createApp(App)
   .use(store)
   .use(router)
   .use(vfmPlugin)
-  .use(Vue3Mq, { preset: "bootstrap5" })
+  .use(Vue3Mq, {
+    breakpoints: {
+      xs: 0,
+      sm: 576,
+      md: 768,
+      lg: 992,
+      xl: 1200,
+      xxl: 1400,
+    },
+  })
   .use(mdiVue, {
     icons: mdijs,
   })
