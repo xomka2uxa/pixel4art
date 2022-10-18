@@ -7,7 +7,7 @@
     }"
   >
     <div class="header__inner">
-      <header-top />
+      <!-- <header-top /> -->
       <div class="header-bottom">
         <div class="container --fluid">
           <div class="header-bottom__inner">
@@ -30,7 +30,7 @@
 <script>
 import { mapGetters } from "vuex";
 
-import HeaderTop from "@/components/default/header-app/HeaderTop.vue";
+// import HeaderTop from "@/components/default/header-app/HeaderTop.vue";
 import HeaderLogo from "@/components/default/header-app/HeaderLogo.vue";
 import HeaderBurger from "@/components/default/header-app/HeaderBurger.vue";
 import HeaderNavWrapper from "@/components/default/header-app/HeaderNavWrapper.vue";
@@ -50,7 +50,7 @@ export default {
     HeaderLogo,
     HeaderBurger,
     HeaderNavWrapper,
-    HeaderTop,
+    // HeaderTop,
     HeaderOpen,
     HeaderSocials,
   },
