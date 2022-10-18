@@ -15,6 +15,7 @@ export default {
   mounted() {
     this.$store.dispatch("header/setHeaderTransparent", true);
     this.$store.dispatch("header/setHeaderCanClosed", false);
+    this.$store.dispatch("header/setHeaderHideMobile", false);
   },
 };
 </script>

@@ -1,10 +1,13 @@
 <template>
-  <div class="header" :class="[isHeaderTransparent ? 'transparent' : '', isHeaderHidden ? 'hide' : '']">
-    <div class="__inner">
+  <div
+    class="header"
+    :class="{ _transparent: isHeaderTransparent, _hidden: isHeaderHidden, _hideMobile: isHeaderHiddenMobile }"
+  >
+    <div class="header__inner">
       <header-top />
       <div class="header-bottom">
         <div class="container --fluid">
-          <div class="header__inner">
+          <div class="header-bottom__inner">
             <header-logo />
             <header-burger @open="openMenuToggle" />
             <header-nav-wrapper :is-open-menu="isOpenMenu" @close="openMenuToggle" />
@@ -45,7 +48,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters("header", ["isHeaderTransparent", "isHeaderHidden"]),
+    ...mapGetters("header", ["isHeaderTransparent", "isHeaderHidden", "isHeaderHiddenMobile"]),
   },
 
   methods: {
@@ -65,7 +68,7 @@ export default {
   color: #fff;
   z-index: 5;
 
-  .__inner {
+  &__inner {
     position: absolute;
     top: 0;
     left: 0;
@@ -77,13 +80,6 @@ export default {
 
   a {
     color: #fff;
-  }
-
-  &__inner {
-    display: flex;
-    min-height: 60px;
-    align-items: center;
-    justify-content: space-between;
   }
 
   &__nav {
@@ -102,19 +98,32 @@ export default {
   }
 }
 
-.transparent {
-  .__inner {
+._transparent {
+  .header__inner {
     background-color: transparent;
   }
 }
 
-.hide {
-  .__inner {
+._hidden {
+  .header__inner {
+    transform: translateY(-115px);
+  }
+}
+
+._hideMobile {
+  .header__inner {
     transform: translateY(-115px);
   }
 }
 
 .header-bottom {
   display: block;
+
+  &__inner {
+    display: flex;
+    min-height: 60px;
+    align-items: center;
+    justify-content: space-between;
+  }
 }
 </style>

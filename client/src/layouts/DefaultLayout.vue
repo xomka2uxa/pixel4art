@@ -1,5 +1,6 @@
 <template>
   <div class="wrapper">
+    привет {{ mq }}
     <header-app />
     <slot />
     <footer-app />
@@ -12,10 +13,14 @@ import FooterApp from "@/components/default/FooterApp.vue";
 
 export default {
   name: "DefaultLayout",
+
+  inject: ["mq"],
+
   components: {
     HeaderApp,
     FooterApp,
   },
+
   computed: {
     layout() {
       return this.$route.meta.layout || "default-layout";
