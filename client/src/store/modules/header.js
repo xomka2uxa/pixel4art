@@ -38,8 +38,8 @@ export default {
       state.isHeaderHidden = !state.isHeaderHidden;
     },
 
-    setHeaderHideMobile(state) {
-      state.isHeaderHiddenMobile = !state.isHeaderHiddenMobile;
+    setHeaderHideMobile(state, flag) {
+      state.isHeaderHiddenMobile = flag;
     },
   },
 
@@ -56,8 +56,8 @@ export default {
       commit("toggleHeaderHidden");
     },
 
-    setHeaderHideMobile({ commit }) {
-      commit("setHeaderHideMobile");
+    setHeaderHideMobile({ commit }, flag) {
+      commit("setHeaderHideMobile", flag);
     },
   },
 };

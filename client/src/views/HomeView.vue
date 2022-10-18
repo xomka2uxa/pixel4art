@@ -1,23 +1,19 @@
 <template>
   <div class="main">
     <first-main-app />
-    <tabs-screen-app />
-    <posts-app />
   </div>
 </template>
 
 <script>
 import FirstMainApp from "@/components/main/FirstMainApp.vue";
-import TabsScreenApp from "/components/main/TabsScreenApp.vue";
-import PostsApp from "@/components/main/PostsApp.vue";
 
 export default {
   name: "HomeView",
 
+  inject: ["mq"],
+
   components: {
     FirstMainApp,
-    TabsScreenApp,
-    PostsApp,
   },
 
   mounted() {
