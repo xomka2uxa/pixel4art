@@ -6,7 +6,9 @@ module.exports = defineConfig({
     sourceMap: true,
     loaderOptions: {
       scss: {
-        additionalData: `@import "@/assets/scss/shared/variables.scss";`,
+        additionalData: `
+        @import "@/assets/scss/shared/fonts.scss";
+        @import "@/assets/scss/shared/variables.scss";`,
       },
     },
   },

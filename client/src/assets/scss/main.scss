@@ -2,36 +2,6 @@
 @import "./grid.scss";
 @import "./spacing.scss";
 
-@font-face {
-  font-family: "AgencyFBCyrillic";
-  font-weight: 400;
-  font-style: normal;
-  font-display: auto;
-  src: local("AgencyFBCyrillic"),
-   url(../fonts/AgencyFBCyrillic/AgencyFBCyrillic.woff) format("woff"),
-   url(../fonts/AgencyFBCyrillic/AgencyFBCyrillic.woff2) format("woff2");
-}
-
-@font-face {
-  font-family: "Roboto";
-  font-weight: 400;
-  font-style: normal;
-  font-display: auto;
-  src:
-   url(../fonts/Roboto/Roboto-Regular.woff) format("woff"),
-   url(../fonts/Roboto/Roboto-Regular.woff2) format("woff2");
-}
-
-@font-face {
-  font-family: "Roboto";
-  font-weight: 600;
-  font-style: bold;
-  font-display: auto;
-  src:
-   url(../fonts/Roboto/Roboto-Bold.woff) format("woff"),
-   url(../fonts/Roboto/Roboto-Bold.woff2) format("woff2");
-}
-
 .btn {
   outline: none;
   border: none;

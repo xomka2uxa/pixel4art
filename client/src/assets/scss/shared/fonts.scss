@@ -1,0 +1,29 @@
+@font-face {
+  font-family: "AgencyFBCyrillic";
+  font-weight: 400;
+  font-style: normal;
+  font-display: auto;
+  src: local("AgencyFBCyrillic"),
+   url(@/assets/fonts/AgencyFBCyrillic/AgencyFBCyrillic.woff) format("woff"),
+   url(@/assets/fonts/AgencyFBCyrillic/AgencyFBCyrillic.woff2) format("woff2");
+}
+
+@font-face {
+  font-family: "Roboto";
+  font-weight: 400;
+  font-style: normal;
+  font-display: auto;
+  src:
+   url(@/assets/fonts/Roboto/Roboto-Regular.woff) format("woff"),
+   url(@/assets/fonts/Roboto/Roboto-Regular.woff2) format("woff2");
+}
+
+@font-face {
+  font-family: "Roboto";
+  font-weight: 600;
+  font-style: bold;
+  font-display: auto;
+  src:
+   url(@/assets/fonts/Roboto/Roboto-Bold.woff) format("woff"),
+   url(@/assets/fonts/Roboto/Roboto-Bold.woff2) format("woff2");
+}
