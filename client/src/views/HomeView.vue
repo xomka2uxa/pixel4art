@@ -1,15 +1,23 @@
 <template>
-  <div class="main"></div>
+  <div class="main">
+    <first-main-app />
+    <tabs-screen-app />
+    <posts-app />
+  </div>
 </template>
 
 <script>
-// @ is an alias to /src
-// import HelloWorld from '@/components/HelloWorld.vue';
+import FirstMainApp from "@/components/main/FirstMainApp.vue";
+import TabsScreenApp from "/components/main/TabsScreenApp.vue";
+import PostsApp from "@/components/main/PostsApp.vue";
 
 export default {
   name: "HomeView",
+
   components: {
-    //    HelloWorld,
+    FirstMainApp,
+    TabsScreenApp,
+    PostsApp,
   },
 
   mounted() {
@@ -22,8 +30,6 @@ export default {
 
 <style lang="scss" scoped>
 .main {
-  min-height: 500px;
-  width: 100%;
-  background-color: #000;
+  margin-bottom: 120px;
 }
 </style>
