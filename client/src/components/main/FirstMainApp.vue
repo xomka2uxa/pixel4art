@@ -10,8 +10,8 @@
             пиксельные арты, создавать
           </p>
           <div class="btn__wrapper">
-            <a href="#" class="test-btn">Попробовать</a>
-            <a href="#" class="login-btn">Зарегистрироваться</a>
+            <router-link :to="`/free-paint`" class="test-btn"> Попробовать </router-link>
+            <!-- <a href="#" class="login-btn">Зарегистрироваться</a> -->
           </div>
         </div>
         <div class="image__wrapper">
@@ -32,18 +32,23 @@ export default {
 .first-screen {
   background: rgb(18, 3, 47) url("@/assets/img/background-first.jpg") no-repeat;
   background-size: cover;
+  min-height: 100vh;
 
   &__container {
     margin: 0 auto;
     width: 100%;
     max-width: 1200px;
-    padding: 130px 10px;
+    padding: 130px 15px;
     padding-bottom: 40px;
     min-height: 100vh;
 
-    @media (min-width: 992px) {
-      padding-bottom: 130px;
+    @media (max-width: 1300px) {
+      max-width: 100%;
     }
+
+    // @media (min-width: 992px) {
+    //   padding-bottom: 130px;
+    // }
   }
 
   &__inner {
@@ -202,7 +207,7 @@ export default {
     }
 
     .image__wrapper {
-      display: none;
+      // display: none;
 
       @media (min-width: 576px) {
         display: block;
@@ -216,7 +221,11 @@ export default {
       }
 
       img {
-        height: 75vh;
+        height: 50vh;
+
+        @media (min-width: 576px) {
+          height: 75vh;
+        }
       }
     }
   }
