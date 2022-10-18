@@ -13,6 +13,7 @@ module.exports = {
     "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off",
     "linebreak-style": ["error", "unix"],
     "no-nested-ternary": "off",
+    "useTabs": false,
     "max-len": ["error", { code: 120 }],
     "vuejs-accessibility/click-events-have-key-events": "off",
     "vue/no-deprecated-slot-attribute": "off",

@@ -1,6 +1,5 @@
 <template>
   <div class="wrapper">
-    привет {{ mq }}
     <header-app />
     <slot />
     <footer-app />
