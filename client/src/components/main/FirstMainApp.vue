@@ -90,7 +90,7 @@ export default {
         text-transform: uppercase;
         font-size: 20px;
         font-weight: 800;
-        font-family: Agency FB Cyrillic, Roboto, Arial, sans-serif;
+        font-family: AgencyFBCyrillic, Roboto, Arial, sans-serif;
 
         @media (min-width: 440px) {
           font-size: 28px;
@@ -108,7 +108,7 @@ export default {
         text-transform: uppercase;
         font-size: 40px;
         text-shadow: 1px 1px 0 #fff;
-        font-family: Agency FB Cyrillic, Roboto, Arial, sans-serif;
+        font-family: AgencyFBCyrillic, Roboto, Arial, sans-serif;
         text-align: center;
 
         @media (min-width: 440px) {
