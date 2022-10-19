@@ -8,16 +8,7 @@
   >
     <div class="header__inner">
       <!-- <header-top /> -->
-      <div class="header-bottom">
-        <div class="container --fluid">
-          <div class="header-bottom__inner">
-            <header-logo />
-            <header-burger @open="openMenuToggle" />
-            <header-nav-wrapper :is-open-menu="isOpenMenu" @close="openMenuToggle" />
-            <header-socials />
-          </div>
-        </div>
-      </div>
+      <header-main />
     </div>
     <header-open
       class="__open-btn"
@@ -31,38 +22,20 @@
 import { mapGetters } from "vuex";
 
 // import HeaderTop from "@/components/default/header-app/HeaderTop.vue";
-import HeaderLogo from "@/components/default/header-app/HeaderLogo.vue";
-import HeaderBurger from "@/components/default/header-app/HeaderBurger.vue";
-import HeaderNavWrapper from "@/components/default/header-app/HeaderNavWrapper.vue";
+import HeaderMain from "@/components/default/header-app/HeaderMain.vue";
 import HeaderOpen from "@/components/default/header-app/HeaderOpen.vue";
-import HeaderSocials from "@/components/default/header-app/HeaderSocials.vue";
 
 export default {
   inject: ["mq"],
 
-  data() {
-    return {
-      isOpenMenu: false,
-    };
-  },
-
   components: {
-    HeaderLogo,
-    HeaderBurger,
-    HeaderNavWrapper,
     // HeaderTop,
+    HeaderMain,
     HeaderOpen,
-    HeaderSocials,
   },
 
   computed: {
     ...mapGetters("header", ["isHeaderTransparent", "isHeaderHidden", "isHeaderHiddenMobile"]),
-  },
-
-  methods: {
-    openMenuToggle() {
-      this.isOpenMenu = !this.isOpenMenu;
-    },
   },
 };
 </script>
@@ -84,6 +57,7 @@ export default {
     background-color: $bg-header;
     transition: transform 0.4s;
     z-index: 2;
+    height: $header-height;
   }
 
   a {
@@ -114,18 +88,7 @@ export default {
 
 ._hidden {
   .header__inner {
-    transform: translateY(-115px);
-  }
-}
-
-.header-bottom {
-  display: block;
-
-  &__inner {
-    display: flex;
-    min-height: 60px;
-    align-items: center;
-    justify-content: space-between;
+    transform: translateY(-$header-height);
   }
 }
 </style>

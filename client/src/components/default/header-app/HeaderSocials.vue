@@ -1,10 +1,7 @@
 <template>
   <div class="header__btn">
-    <a href="#" class="login_wrapper" v-if="isHeaderCanClosed" @click="$store.dispatch('header/toggleHeaderHidden')">
-      <mdicon name="arrow-up-thick" class="preheader-soc" />
-    </a>
-    <!-- <div class="border" v-if="isHeaderCanClosed"></div> -->
-    <!-- <a href="#" class="vk__wrapper preheader-soc" :class="isHeaderTransparent ? 'white' : ''">
+    <div class="border" v-if="isHeaderCanClosed"></div>
+    <a href="#" class="vk__wrapper preheader-soc" :class="isHeaderTransparent ? 'white' : ''">
       <svg width="20" height="12" viewBox="0 0 20 12" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path
           d="M17.8021 8.41176C17.8021 8.41176 19.4191 10.0878 19.8191
@@ -53,14 +50,14 @@
           15.7277 16.5592 14.798Z"
         />
       </svg>
-    </a> -->
+    </a>
   </div>
 </template>
 <script>
 import { mapGetters } from "vuex";
 export default {
   computed: {
-    ...mapGetters("header", ["isHeaderTransparent"]),
+    ...mapGetters("header", ["isHeaderTransparent", "isHeaderCanClosed"]),
   },
 
   methods: {},

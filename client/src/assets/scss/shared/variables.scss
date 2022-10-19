@@ -1,12 +1,11 @@
 $bg-preheader: #2C0946;
 $bg-header: #39095E;
 
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.5s ease;
-}
+$header-height: 60px;
 
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
+$xs: 0px;
+$sm: 576px;
+$md: 768px;
+$lg: 992px;
+$xl: 1200px;
+$xxl: 1400px;

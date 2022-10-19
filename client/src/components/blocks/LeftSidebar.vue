@@ -1,7 +1,7 @@
 <template>
   <div class="left-sidebar" :class="[isHeaderHidden ? '_header-hidden' : '']">
-    <div class="__inner">
-      <div class="__box control-btn">
+    <div class="left-sidebar__inner">
+      <div class="left-sidebar__box control-btn">
         <div class="row mx-5">
           <div class="col px-5">
             <button class="btn --circle" title="Очистить холст" @click="makeCanvasCleanModal">
@@ -37,7 +37,7 @@
           </div>
         </div>
       </div>
-      <div class="__box choose-color">
+      <div class="left-sidebar__box choose-color">
         <div class="scaling">
           <button class="btn --circle" title="Меньше" @click="doScaling(-1)">
             <mdicon name="minus" class="my-mdi" />
@@ -48,7 +48,7 @@
           </button>
         </div>
       </div>
-      <div class="__box choose-color">
+      <div class="left-sidebar__box choose-color">
         <div class="row mx-5 align-center">
           <div class="col px-5">Выбрать цвет:</div>
           <div class="col px-5 ml-auto">
@@ -78,7 +78,7 @@
         </div>
       </div>
 
-      <div class="__box color-pallete">
+      <div class="left-sidebar__box color-pallete">
         <div class="__header">
           <div class="__title">Палитра</div>
           <button
@@ -103,7 +103,7 @@
         </div>
       </div>
 
-      <div class="__box color-pallete canvas-pallete">
+      <div class="left-sidebar__box color-pallete canvas-pallete">
         <div class="__header">
           <div class="__title">Использованные цвета</div>
           <Popper placement="right">
@@ -145,7 +145,7 @@
         </div>
       </div>
 
-      <div class="__box choose-size">
+      <div class="left-sidebar__box choose-size">
         <div class="__title">Выбрать размер</div>
         <select v-model="sizePaint">
           <option v-for="(val, name) in defaultSizesPaint" :key="name" :value="name" :disabled="name == 'custom'">
@@ -154,7 +154,7 @@
         </select>
         <button @click="chooseSize" :disabled="sizePaint == 'custom'">OK</button>
       </div>
-      <div class="__box choose-size">
+      <div class="left-sidebar__box choose-size">
         <div class="__title">Задать свой размер</div>
         <label for="">Ширина: <input v-model="customSizePaint.cols" type="text" /></label>
         <label for="">Высота: <input v-model="customSizePaint.rows" type="text" /></label>
@@ -294,10 +294,11 @@ export default {
   },
 };
 </script>
+
 <style lang="scss" scoped>
 .left-sidebar {
   position: absolute;
-  top: 110px;
+  top: $header-height;
   left: 0;
   bottom: 0;
   width: 200px;
@@ -310,13 +311,17 @@ export default {
     top: 0;
   }
 
-  .__inner {
+  @include xl-down {
+    top: 0;
+  }
+
+  &__inner {
     padding: 10px 10px 75px;
     height: 100%;
     overflow: auto;
   }
 
-  .__box {
+  &__box {
     padding: 10px 0;
     border-bottom: 1px solid #cbcbcb;
 
