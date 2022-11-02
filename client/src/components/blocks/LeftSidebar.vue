@@ -145,7 +145,7 @@
         </div>
       </div>
 
-      <div class="left-sidebar__box choose-size">
+      <!-- <div class="left-sidebar__box choose-size">
         <div class="__title">Выбрать размер</div>
         <select v-model="sizePaint">
           <option v-for="(val, name) in defaultSizesPaint" :key="name" :value="name" :disabled="name == 'custom'">
@@ -160,7 +160,7 @@
         <label for="">Высота: <input v-model="customSizePaint.rows" type="text" /></label>
         <button @click="chooseCustomSize">ОК</button>
         <div class="__title">Не может превышать 800x600</div>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
@@ -198,7 +198,7 @@ export default {
   },
 
   mounted() {
-    this.sizePaint = this.selectedSizePaint.name;
+    this.sizePaint = this.currentSizesPaint.name;
   },
 
   computed: {
@@ -206,7 +206,7 @@ export default {
       "selectedColor",
       "colorPallete",
       "getSizePaint",
-      "selectedSizePaint",
+      "currentSizesPaint",
       "defaultSizesPaint",
       "cntHistoryAction",
     ]),
@@ -407,11 +407,11 @@ export default {
   align-items: center;
 }
 
-.modal-content {
-  padding: 15px;
-  background: #fff;
-  border-radius: 10px;
-}
+// .modal-content {
+//   padding: 15px;
+//   background: #fff;
+//   border-radius: 10px;
+// }
 
 .modal__actions {
   margin-top: 15px;

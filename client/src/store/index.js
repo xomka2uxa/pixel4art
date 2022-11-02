@@ -1,6 +1,5 @@
 import { createStore } from "vuex";
 import header from "./modules/header";
-const defaultSizePaint = { name: "sm", value: [50, 50] };
 
 export default createStore({
   modules: {
@@ -10,7 +9,7 @@ export default createStore({
   state: {
     selectedColor: "rgb(255, 136, 0)",
     colorPallete: [],
-    selectedSizePaint: defaultSizePaint,
+    currentSizesPaint: [50, 50],
     defaultSizesPaint: {
       xs: [20, 20],
       sm: [50, 50],
@@ -35,8 +34,8 @@ export default createStore({
       return state.colorPallete;
     },
 
-    selectedSizePaint(state) {
-      return state.selectedSizePaint;
+    currentSizesPaint(state) {
+      return state.currentSizesPaint;
     },
 
     defaultSizesPaint(state) {
@@ -77,17 +76,15 @@ export default createStore({
     },
 
     setSizePaint(state, size) {
-      state.selectedSizePaint = {
-        name: size,
-        value: state.defaultSizesPaint[size],
-      };
+      state.currentSizesPaint = size;
     },
 
     setCustomSizePaint(state, size) {
-      state.selectedSizePaint = {
-        name: "custom",
-        value: [+size.cols, +size.rows],
-      };
+      size[0] = +size.cols;
+      size[1] = +size.rows;
+      delete size.cols;
+      delete size.rows;
+      state.currentSizesPaint = size;
     },
 
     setRectList(state, list) {

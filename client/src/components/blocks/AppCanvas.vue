@@ -18,6 +18,7 @@
       @do-scaling="doScaling"
       @replace-color-on-canvas="replaceColorOnCanvas"
     />
+    <canvas-panel-footer :historyList="rectListHistory.actions" :scale-in-prc="scaleInPrc" @do-scaling="doScaling" />
     <view-mode-tooltip v-if="isScaleInPrc" />
   </div>
 </template>
@@ -26,11 +27,14 @@
 import { mapGetters } from "vuex";
 import { getColorIndexInRectList } from "@/assets/js/utilsCanvas.js";
 import LeftSidebar from "@/components/blocks/LeftSidebar.vue";
+import CanvasPanelFooter from "@/components/blocks/CanvasPanelFooter.vue";
 import ViewModeTooltip from "@/components/blocks/ViewModeTooltip.vue";
 /*
 Задачи
 3. События мобилы
 4. Делать адаптив
+открытие модлок по быстрым клавишам
+закрытие модалок по enter
 5. попробовать переводить в рисунок часть картинки
 6. Подставлять вместо квадратов и линий картинку если меньше одного пикселя
 8. Сохранять в локалсторадже
@@ -46,6 +50,7 @@ import ViewModeTooltip from "@/components/blocks/ViewModeTooltip.vue";
 export default {
   components: {
     LeftSidebar,
+    CanvasPanelFooter,
     ViewModeTooltip,
   },
 
@@ -91,8 +96,8 @@ export default {
 
   mounted() {
     window.addEventListener("resize", this.changeSizeCanvas);
-    this.cc.cols = this.selectedSizePaint.value[0];
-    this.cc.rows = this.selectedSizePaint.value[1];
+    this.cc.cols = this.currentSizesPaint[0];
+    this.cc.rows = this.currentSizesPaint[1];
     this.initCanvas();
     this.changeSizeCanvas();
     this.draw();
@@ -102,11 +107,11 @@ export default {
   },
 
   watch: {
-    "$store.state.selectedSizePaint": {
+    "$store.state.currentSizesPaint": {
       handler(val) {
         this.rectList = [];
-        this.cc.cols = val.value[0];
-        this.cc.rows = val.value[1];
+        this.cc.cols = val[0];
+        this.cc.rows = val[1];
         this.$store.dispatch("setCanvasClean", true);
       },
       deep: true,
@@ -148,7 +153,7 @@ export default {
   computed: {
     ...mapGetters([
       "selectedColor",
-      "selectedSizePaint",
+      "currentSizesPaint",
       "isCanvasClean",
       "colorPallete",
       "cntHistoryAction",
