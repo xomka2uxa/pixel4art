@@ -12,13 +12,19 @@
         @mousemove="handleCanvasEvent"
       ></canvas>
     </div>
-    <left-sidebar
+    <canvas-panel-left
       :scale-in-prc="scaleInPrc"
       :colors-on-canvas="colorsOnCanvas"
       @do-scaling="doScaling"
       @replace-color-on-canvas="replaceColorOnCanvas"
     />
-    <canvas-panel-footer :historyList="rectListHistory.actions" :scale-in-prc="scaleInPrc" @do-scaling="doScaling" />
+    <!-- <left-sidebar
+      :scale-in-prc="scaleInPrc"
+      :colors-on-canvas="colorsOnCanvas"
+      @do-scaling="doScaling"
+      @replace-color-on-canvas="replaceColorOnCanvas"
+    /> -->
+    <canvas-panel-footer :historyList="rectListHistory.actions" />
     <view-mode-tooltip v-if="isScaleInPrc" />
   </div>
 </template>
@@ -26,8 +32,9 @@
 <script>
 import { mapGetters } from "vuex";
 import { getColorIndexInRectList } from "@/assets/js/utilsCanvas.js";
-import LeftSidebar from "@/components/blocks/LeftSidebar.vue";
+// import LeftSidebar from "@/components/blocks/LeftSidebar.vue";
 import CanvasPanelFooter from "@/components/blocks/CanvasPanelFooter.vue";
+import CanvasPanelLeft from "@/components/blocks/CanvasPanelLeft.vue";
 import ViewModeTooltip from "@/components/blocks/ViewModeTooltip.vue";
 /*
 Задачи
@@ -49,9 +56,10 @@ import ViewModeTooltip from "@/components/blocks/ViewModeTooltip.vue";
 */
 export default {
   components: {
-    LeftSidebar,
+    // LeftSidebar,
     CanvasPanelFooter,
     ViewModeTooltip,
+    CanvasPanelLeft,
   },
 
   data() {

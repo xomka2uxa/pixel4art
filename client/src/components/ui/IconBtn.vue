@@ -60,8 +60,8 @@ export default {
   position: relative;
   fill: white;
   transition: fill 0.5s;
-  height: 20px;
-  width: 20px;
+  height: 25px;
+  width: 25px;
 }
 
 .bg_color {
@@ -89,8 +89,6 @@ export default {
 }
 
 .icon-btn:hover {
-  cursor: pointer;
-
   .bg_color {
     .icon-btn__overlay {
       background: linear-gradient(to right, $color1-gold-gradient, $color2-gold-gradient);

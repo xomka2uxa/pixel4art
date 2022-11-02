@@ -161,9 +161,15 @@ export default {
   right: 0;
   background-color: $bg-header;
   color: #fff;
-  padding: 15px 0 15px 200px;
+  padding: 15px 0;
   z-index: 5;
   box-shadow: 0 -4px 7px 0 rgba(0, 0, 0, 0.35);
+
+  @include sm-down {
+    overflow-x: scroll;
+    overflow-y: hidden;
+    white-space: nowrap;
+  }
 
   &__inner {
     display: flex;
