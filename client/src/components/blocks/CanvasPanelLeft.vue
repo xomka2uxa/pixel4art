@@ -346,8 +346,8 @@ export default {
   }
 
   :deep(svg) {
-    height: 20px;
-    width: 20px;
+    height: 17px;
+    width: 17px;
     cursor: pointer;
     fill: $color-icon-btn;
     transition: fill 0.3s;

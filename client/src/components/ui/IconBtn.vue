@@ -95,7 +95,7 @@ export default {
 }
 
 .icon-btn__inner.nested {
-  width: 109px;
+  width: 100px;
   background: linear-gradient(to right, $color1-gold-gradient, $color2-gold-gradient);
   display: flex;
 
