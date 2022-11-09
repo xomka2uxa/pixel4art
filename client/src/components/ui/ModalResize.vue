@@ -317,11 +317,12 @@ export default {
 
 <style lang="scss" scoped>
 .popup__wrapper {
-  border-radius: 15px;
   background-color: #fff;
   box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.25);
   width: 500px;
   position: relative;
+  height: 100%;
+  overflow-y: auto;
 
   @include md-down {
     width: 90vw;
@@ -330,7 +331,6 @@ export default {
 }
 
 .popup__up {
-  border-radius: 15px 15px 0 0;
   background: linear-gradient(to right, $color1-gold-gradient, $color2-gold-gradient);
   display: flex;
   align-items: center;

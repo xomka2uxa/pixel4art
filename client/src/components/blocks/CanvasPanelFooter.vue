@@ -5,7 +5,12 @@
         <icon-btn isRound isSmall title="Изменить размер холста (Alt+CTRL+C)" @click="CanvasShowModal">
           <mdicon name="resize" />
         </icon-btn>
-        <vue-final-modal v-model="showModal" classes="modal-container" content-class="modal-content">
+        <vue-final-modal
+          v-model="showModal"
+          classes="modal-container --right"
+          :lock-scroll="false"
+          content-class="modal-content"
+        >
           <modal-resize @close="showModal = false" />
         </vue-final-modal>
       </div>
