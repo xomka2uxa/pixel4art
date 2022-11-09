@@ -57,11 +57,36 @@
           class="zoom__btn"
           title="Увеличить масштаб"
           @click="doScaling(1)"
-          :class="{ disabled: scaleInPrc >= 100 }"
+          :class="{ disabled: scaleInPrc >= 200 }"
         >
           <mdicon name="magnify-plus-outline" />
         </icon-btn>
       </div>
+      <!-- <div class="canvas-panel__box flex">
+        <icon-btn
+          isLayer
+          isSmall
+          title="Слой с эскизом"
+          class="layer__btn"
+          :class="{ active: isImage }"
+          @click="SwitchTumbler"
+        >
+          <mdicon name="file-image" />
+        </icon-btn>
+        <div class="tumbler__wrapper" @click="SwitchTumbler">
+          <div class="tumbler" :class="{ image: isImage }"></div>
+        </div>
+        <icon-btn
+          isLayer
+          isSmall
+          class="layer__btn"
+          title="Слой с рисованием"
+          :class="{ active: !isImage }"
+          @click="SwitchTumbler"
+        >
+          <mdicon name="brush" />
+        </icon-btn>
+      </div> -->
     </div>
     <div class="canvas-panel__inner">
       <div class="canvas-panel__box info">

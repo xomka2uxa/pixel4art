@@ -1,20 +1,37 @@
 <template>
   <div class="popup__wrapper">
     <div class="popup__up">
-      <span class="popup__title">Рисование</span>
+      <span class="popup__title">Замена цвета</span>
       <button class="btn__close" @click="$emit('close')">X</button>
     </div>
     <div class="popup__inner">
       <div class="current-size">
         <div class="inner__title">
-          <span>Текущий цвет</span>
+          <span>Цвет для замены</span>
+          {{ change }}
+        </div>
+        <div class="inner__content">
+          <div v-if="pallete.length" class="__body color-list flex">
+            <div
+              v-for="(item, i) in pallete"
+              :key="i"
+              :class="['color-item', item === сhange ? '_active' : '']"
+              :style="{ background: item }"
+              @click="chooseColorPalette(item)"
+            ></div>
+          </div>
+        </div>
+      </div>
+      <div class="current-size">
+        <div class="inner__title">
+          <span>Сравнение цветов:</span>
         </div>
         <div class="inner__content">
           <div class="feature__title">
             <div class="flex__center colors__wrapper">
               <div class="flex">
-                <p class="color_name modal-container">Сравнение цветов:</p>
-                <div class="colors__inner" :style="{ background: selected }"></div>
+                <p class="color_name modal-container">Текущий цвет</p>
+                <div class="colors__inner" :style="{ background: drawing }"></div>
               </div>
               <div class="flex">
                 <p class="color_name modal-container">Новый цвет:</p>
@@ -26,7 +43,7 @@
       </div>
       <div class="current-size">
         <div class="inner__title">
-          <span>Выбор цвета для рисования</span>
+          <span>Выбор нового цвета </span>
         </div>
         <div class="inner__content">
           <div class="color-picker">
@@ -64,7 +81,14 @@ export default {
     updateDrawingColor: null,
   },
 
-  props: ["drawing", "selected"],
+  props: ["drawing", "selected", "pallete"],
+
+  data() {
+    return {
+      change: "",
+      selectedNewColorForChange: "",
+    };
+  },
 
   components: {
     ColorPicker,
@@ -82,6 +106,10 @@ export default {
 
     chooseColor(e) {
       this.$emit("chooseColor", e);
+    },
+
+    chooseColorPalette(color) {
+      this.change = color;
     },
 
     closeModal() {
@@ -196,6 +224,15 @@ export default {
 
   .color_name {
     margin-right: 10px;
+  }
+}
+
+.color-item {
+  width: 15px;
+  height: 15px;
+
+  &._active {
+    border: 2px solid rgba(46, 46, 46, 0.4);
   }
 }
 

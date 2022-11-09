@@ -1,7 +1,14 @@
 <template>
   <div class="icon-btn" :class="{ active: isActive }">
     <button
-      :class="[{ bg_color: isBgColor }, { round: isRound }, { small: isSmall }]"
+      :class="[
+        { bg_color: isBgColor },
+        { round: isRound },
+        { small: isSmall },
+        { black: isBlack },
+        { nested: isNested },
+        { layer: isLayer },
+      ]"
       class="icon-btn__inner"
       :title="title"
     >
@@ -22,11 +29,23 @@ export default {
       type: Boolean,
       default: false,
     },
+    isBlack: {
+      type: Boolean,
+      default: false,
+    },
+    isNested: {
+      type: Boolean,
+      default: false,
+    },
     isSmall: {
       type: Boolean,
       default: false,
     },
     isActive: {
+      type: Boolean,
+      default: false,
+    },
+    isLayer: {
       type: Boolean,
       default: false,
     },
@@ -64,6 +83,35 @@ export default {
   width: 25px;
 }
 
+.black,
+.blackWhite {
+  &.icon-btn__inner :deep(svg) {
+    fill: $black;
+  }
+}
+
+.icon-btn__inner {
+  transition: width 0.3s;
+}
+
+.icon-btn__inner.nested {
+  width: 109px;
+  background: linear-gradient(to right, $color1-gold-gradient, $color2-gold-gradient);
+  display: flex;
+
+  &.icon-btn__inner :deep(svg) {
+    fill: white;
+  }
+}
+
+.layer {
+  &.icon-btn__inner :deep(svg) {
+    fill: $color-icon-btn;
+    opacity: 0.5;
+    transition: opacity 0.35s fill 0.35s;
+  }
+}
+
 .bg_color {
   background: $bg-icon-btn;
   position: relative;
@@ -88,6 +136,13 @@ export default {
   }
 }
 
+.active .layer {
+  &.icon-btn__inner :deep(svg) {
+    fill: #fbc221;
+    opacity: 1;
+  }
+}
+
 .icon-btn:hover {
   .bg_color {
     .icon-btn__overlay {
@@ -104,6 +159,20 @@ export default {
 
     &.icon-btn__inner :deep(svg) {
       fill: $bg-header;
+    }
+  }
+
+  .black {
+    background: none;
+
+    &.icon-btn__inner :deep(svg) {
+      fill: $bg-header;
+    }
+  }
+
+  .layer {
+    &.icon-btn__inner :deep(svg) {
+      opacity: 1;
     }
   }
 }
@@ -124,6 +193,20 @@ export default {
 
     &.icon-btn__inner :deep(svg) {
       fill: $bg-header;
+    }
+  }
+
+  .black {
+    background: none;
+
+    &.icon-btn__inner :deep(svg) {
+      fill: $bg-header;
+    }
+  }
+
+  .layer {
+    &.icon-btn__inner :deep(svg) {
+      opacity: 1;
     }
   }
 }

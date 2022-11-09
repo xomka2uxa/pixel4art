@@ -1,49 +1,27 @@
 <template>
   <div class="popup__wrapper">
     <div class="popup__up">
-      <span class="popup__title">Рисование</span>
+      <span class="popup__title">Загрузка эскиза</span>
       <button class="btn__close" @click="$emit('close')">X</button>
     </div>
     <div class="popup__inner">
       <div class="current-size">
         <div class="inner__title">
-          <span>Текущий цвет</span>
+          <span>Выбор изображения для эскиза</span>
         </div>
         <div class="inner__content">
-          <div class="feature__title">
-            <div class="flex__center colors__wrapper">
-              <div class="flex">
-                <p class="color_name modal-container">Сравнение цветов:</p>
-                <div class="colors__inner" :style="{ background: selected }"></div>
-              </div>
-              <div class="flex">
-                <p class="color_name modal-container">Новый цвет:</p>
-                <div class="colors__inner" :style="{ background: drawing }"></div>
-              </div>
-            </div>
+          <div class="attention __grey">
+            Изображение будет помещено на слой под основным слоем для рисования с прозрачностью в 30%. Формат — JPG,
+            WEBP, или PNG.
           </div>
-        </div>
-      </div>
-      <div class="current-size">
-        <div class="inner__title">
-          <span>Выбор цвета для рисования</span>
-        </div>
-        <div class="inner__content">
-          <div class="color-picker">
-            <ColorPicker
-              color="#f80b"
-              default-format="rgb"
-              :visible-formats="['hex']"
-              alpha-channel="hide"
-              @color-change="chooseColor"
-            >
-            </ColorPicker>
-          </div>
+          <icon-btn isRound isBlack title="Загрузить картинку" class="icon__wrapper">
+            <mdicon name="file-image-plus" />
+          </icon-btn>
         </div>
       </div>
       <div class="buttons">
         <div class="col-50">
-          <button @click="updateDrawingColor" class="test-btn btn-modal">OK</button>
+          <button @click="$emit('close')" class="test-btn btn-modal">ЗАГРУЗИТЬ</button>
         </div>
         <div class="col-50">
           <button class="test-btn btn-modal" @click="$emit('close')">ОТМЕНА</button>
@@ -55,19 +33,15 @@
 
 <script>
 import { mapGetters } from "vuex";
-import { ColorPicker } from "vue-accessible-color-picker";
+import IconBtn from "@/components/ui/IconBtn.vue";
 
 export default {
   emits: {
     close: null,
-    chooseColor: null,
-    updateDrawingColor: null,
   },
 
-  props: ["drawing", "selected"],
-
   components: {
-    ColorPicker,
+    IconBtn,
   },
 
   computed: {
@@ -75,15 +49,6 @@ export default {
   },
 
   methods: {
-    updateDrawingColor() {
-      this.$emit("updateDrawingColor");
-      this.$emit("close");
-    },
-
-    chooseColor(e) {
-      this.$emit("chooseColor", e);
-    },
-
     closeModal() {
       this.$emit("close");
     },
@@ -178,6 +143,7 @@ export default {
       padding: 19px 12px 16px;
       display: flex;
       justify-content: center;
+      flex-direction: column;
       color: $black;
       font-family: Roboto, Helvetica, Arial, sans-serif;
       font-weight: 600;
@@ -186,24 +152,37 @@ export default {
   }
 }
 
-.colors__wrapper {
-  flex-direction: column;
-
-  .colors__inner {
-    width: 100px;
-    height: 30px;
-  }
-
-  .color_name {
-    margin-right: 10px;
-  }
-}
-
 .current-size {
   .feature__title {
     margin-bottom: 0;
     width: auto;
   }
+}
+
+.attention {
+  margin-top: 10px;
+  color: #fc5454;
+  font-weight: 300;
+  font-size: 10px;
+
+  @include md-down {
+    display: flex;
+    align-items: center;
+  }
+
+  &.__grey {
+    color: $dark-grey;
+    font-size: 12px;
+
+    @include md-down {
+      margin-left: 0;
+    }
+  }
+}
+
+.icon__wrapper {
+  display: flex;
+  justify-content: center;
 }
 
 .buttons {

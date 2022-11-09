@@ -299,7 +299,7 @@ export default {
 .left-sidebar {
   position: absolute;
   top: $header-height;
-  left: 0;
+  right: 0;
   bottom: 0;
   width: 200px;
   background: #fff;

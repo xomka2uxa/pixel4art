@@ -12,19 +12,14 @@
         @mousemove="handleCanvasEvent"
       ></canvas>
     </div>
-    <canvas-panel-left
+    <canvas-panel-left :colors-on-canvas="colorsOnCanvas" @replace-color-on-canvas="replaceColorOnCanvas" />
+    <left-sidebar
       :scale-in-prc="scaleInPrc"
       :colors-on-canvas="colorsOnCanvas"
       @do-scaling="doScaling"
       @replace-color-on-canvas="replaceColorOnCanvas"
     />
-    <!-- <left-sidebar
-      :scale-in-prc="scaleInPrc"
-      :colors-on-canvas="colorsOnCanvas"
-      @do-scaling="doScaling"
-      @replace-color-on-canvas="replaceColorOnCanvas"
-    /> -->
-    <canvas-panel-footer :historyList="rectListHistory.actions" />
+    <canvas-panel-footer :historyList="rectListHistory.actions" :scale-in-prc="scaleInPrc" @do-scaling="doScaling" />
     <view-mode-tooltip v-if="isScaleInPrc" />
   </div>
 </template>
@@ -32,12 +27,13 @@
 <script>
 import { mapGetters } from "vuex";
 import { getColorIndexInRectList } from "@/assets/js/utilsCanvas.js";
-// import LeftSidebar from "@/components/blocks/LeftSidebar.vue";
+import LeftSidebar from "@/components/blocks/LeftSidebar.vue";
 import CanvasPanelFooter from "@/components/blocks/CanvasPanelFooter.vue";
 import CanvasPanelLeft from "@/components/blocks/CanvasPanelLeft.vue";
 import ViewModeTooltip from "@/components/blocks/ViewModeTooltip.vue";
 /*
 Задачи
+Усли модалка открыта, то на холсте не рисуем???
 3. События мобилы
 4. Делать адаптив
 открытие модлок по быстрым клавишам
@@ -56,7 +52,7 @@ import ViewModeTooltip from "@/components/blocks/ViewModeTooltip.vue";
 */
 export default {
   components: {
-    // LeftSidebar,
+    LeftSidebar,
     CanvasPanelFooter,
     ViewModeTooltip,
     CanvasPanelLeft,

@@ -1,7 +1,7 @@
 <template>
   <div class="popup__wrapper">
     <div class="popup__up">
-      <span class="popup__title">Рисование</span>
+      <span class="popup__title">Цвет фона</span>
       <button class="btn__close" @click="$emit('close')">X</button>
     </div>
     <div class="popup__inner">
@@ -14,11 +14,11 @@
             <div class="flex__center colors__wrapper">
               <div class="flex">
                 <p class="color_name modal-container">Сравнение цветов:</p>
-                <div class="colors__inner" :style="{ background: selected }"></div>
+                <div class="colors__inner" style="background: red"></div>
               </div>
               <div class="flex">
                 <p class="color_name modal-container">Новый цвет:</p>
-                <div class="colors__inner" :style="{ background: drawing }"></div>
+                <div class="colors__inner" style="background: blue"></div>
               </div>
             </div>
           </div>
@@ -26,7 +26,7 @@
       </div>
       <div class="current-size">
         <div class="inner__title">
-          <span>Выбор цвета для рисования</span>
+          <span>Выбор цвета для фона</span>
         </div>
         <div class="inner__content">
           <div class="color-picker">
@@ -60,11 +60,9 @@ import { ColorPicker } from "vue-accessible-color-picker";
 export default {
   emits: {
     close: null,
-    chooseColor: null,
+    chooseColorFon: null,
     updateDrawingColor: null,
   },
-
-  props: ["drawing", "selected"],
 
   components: {
     ColorPicker,
@@ -81,7 +79,7 @@ export default {
     },
 
     chooseColor(e) {
-      this.$emit("chooseColor", e);
+      this.$emit("chooseColorFon", e);
     },
 
     closeModal() {

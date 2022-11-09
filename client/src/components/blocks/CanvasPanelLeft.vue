@@ -3,13 +3,57 @@
     <div class="left-sidebar__inner">
       <div class="left-sidebar__box choose-color">
         <div class="flex-center">
+          <div class="col col-layer">
+            <div class="flex-center">
+              <transition name="fade" mode="out-in">
+                <icon-btn
+                  v-if="isImage"
+                  isLayer
+                  isSmall
+                  title="Слой с эскизом"
+                  class="layer__btn"
+                  :class="{ active: isImage }"
+                >
+                  <mdicon name="file-image" />
+                </icon-btn>
+                <icon-btn
+                  v-else
+                  isLayer
+                  isSmall
+                  class="layer__btn"
+                  title="Слой с рисованием"
+                  :class="{ active: !isImage }"
+                >
+                  <mdicon name="brush" />
+                </icon-btn>
+              </transition>
+            </div>
+            <div class="tumbler__wrapper" @click="SwitchTumbler">
+              <div class="tumbler" :class="{ image: isImage }"></div>
+            </div>
+          </div>
           <div class="col">
             <Popper placement="right-start">
-              <icon-btn isBgColor title="Покрасить фон" @click="ShowModalPouring">
-                <mdicon name="brush" />
+              <icon-btn isBgColor title="Загрузить картинку" @click="ShowModalImage">
+                <mdicon name="file-image-plus" />
               </icon-btn>
               <template #content="{ close }">
-                <modal-pouring @update-drawing-color="updateDrawingColor" @choose-color="chooseColor" @close="close" />
+                <modal-image @close="close" />
+              </template>
+            </Popper>
+          </div>
+          <div class="col">
+            <div v-if="isImage" class="overlay"></div>
+            <Popper placement="right-start">
+              <icon-btn isBgColor title="Покрасить фон" @click="ShowModalFon">
+                <mdicon name="format-color-fill" />
+              </icon-btn>
+              <template #content="{ close }">
+                <modal-fon
+                  @update-drawing-color="updateDrawingColor"
+                  @choose-color-fon="chooseColorFon"
+                  @close="close"
+                />
               </template>
               <template #copy-button>
                 <div title="Заменить цвет" @click="replaceColorOnCanvas">
@@ -19,12 +63,25 @@
             </Popper>
           </div>
           <div class="col">
+            <div v-if="isImage" class="overlay"></div>
+            <icon-btn isBgColor title="Ластик" @click="Eraser">
+              <mdicon name="eraser" />
+            </icon-btn>
+          </div>
+          <div class="col">
+            <div v-if="isImage" class="overlay"></div>
             <Popper placement="right-start">
-              <icon-btn isBgColor title="Покрасить фон" @click="ShowModalPouring">
+              <icon-btn isBgColor title="Цвет рисования" @click="ShowModalPouring">
                 <mdicon name="brush" />
               </icon-btn>
               <template #content="{ close }">
-                <modal-pouring @update-drawing-color="updateDrawingColor" @choose-color="chooseColor" @close="close" />
+                <modal-pouring
+                  @update-drawing-color="updateDrawingColor"
+                  @choose-color="chooseColor"
+                  @close="close"
+                  :drawing="drawingColor"
+                  :selected="selectedColor"
+                />
               </template>
               <template #copy-button>
                 <div title="Заменить цвет" @click="replaceColorOnCanvas">
@@ -32,6 +89,40 @@
                 </div>
               </template>
             </Popper>
+          </div>
+          <div class="col">
+            <div v-if="!colorsOnCanvas.length || isImage" class="overlay"></div>
+            <Popper placement="right-start">
+              <icon-btn isBgColor title="Замена цвета" @click="ShowModalChange">
+                <mdicon name="invert-colors" />
+              </icon-btn>
+              <template #content="{ close }">
+                <modal-change
+                  @update-drawing-color="updateDrawingColor"
+                  @choose-color="chooseColor"
+                  @close="close"
+                  :pallete="colorsOnCanvas"
+                  :drawing="drawingColor"
+                  :selected="selectedColor"
+                />
+              </template>
+              <template #copy-button>
+                <div title="Заменить цвет" @click="replaceColorOnCanvas">
+                  <mdicon name="content-copy" class="my-mdi" />
+                </div>
+              </template>
+            </Popper>
+          </div>
+          <div class="col">
+            <div v-if="isImage" class="overlay"></div>
+            <icon-btn isBgColor :isNested="isNested" title="Палитра" @click="ShowInnerPalette" class="palet__wrapper">
+              <mdicon name="palette" />
+            </icon-btn>
+            <div class="palet__inner flex" :class="{ palette__visible: isPalette }">
+              <mdicon title="Добавить цвет" name="plus-thick" class="icon__palette" />
+              <mdicon title="Удалить цвет" name="minus-thick" class="icon__palette" />
+              <mdicon title="Заменить цвет" name="invert-colors" class="icon__palette" />
+            </div>
           </div>
         </div>
       </div>
@@ -44,6 +135,9 @@ import { mapGetters } from "vuex";
 import Popper from "vue3-popper";
 import IconBtn from "@/components/ui/IconBtn.vue";
 import ModalPouring from "@/components/ui/ModalPouring.vue";
+import ModalFon from "@/components/ui/ModalFon.vue";
+import ModalChange from "@/components/ui/ModalChange.vue";
+import ModalImage from "@/components/ui/ModalImage.vue";
 
 export default {
   inject: ["mq"],
@@ -52,6 +146,9 @@ export default {
     Popper,
     IconBtn,
     ModalPouring,
+    ModalFon,
+    ModalImage,
+    ModalChange,
   },
 
   props: ["colorsOnCanvas"],
@@ -61,8 +158,14 @@ export default {
   data() {
     return {
       isShowModalPouring: false,
+      isShowModalFon: false,
+      isShowModalImage: false,
+      isShowModalChange: false,
       drawingColor: "",
-      selectedColorForChange: "",
+      isImage: false,
+      isPalette: false,
+      isNested: false,
+      // selectedColorForChange: "",
       selectedNewColorForChange: "",
     };
   },
@@ -74,8 +177,30 @@ export default {
   },
 
   methods: {
+    ShowInnerPalette() {
+      this.isPalette = !this.isPalette;
+      this.isNested = !this.isNested;
+    },
+
+    ShowModalChange() {
+      this.isShowModalChange = true;
+    },
+
     ShowModalPouring() {
       this.isShowModalPouring = true;
+    },
+
+    ShowModalImage() {
+      this.isShowModalImage = true;
+    },
+
+    ShowModalFon() {
+      this.isShowModalFon = true;
+    },
+
+    Eraser() {
+      this.drawingColor = `rgb(255, 255, 255)`;
+      this.$store.dispatch("setSelectedColor", this.drawingColor);
     },
 
     updateDrawingColor() {
@@ -83,13 +208,25 @@ export default {
       this.isShowModalPouring = false;
     },
 
-    chooseColor(e) {
-      console.log(e);
+    chooseColorFon(e) {
       let arr = e.cssColor.slice(e.cssColor.indexOf("(") + 1, e.cssColor.indexOf(")")).split(" ");
       arr.forEach((el, i) => {
         arr[i] = Math.floor(el);
       });
       this.drawingColor = `rgb(${arr.join(", ")})`;
+      console.log(this.drawingColor);
+    },
+
+    chooseColor(e) {
+      let arr = e.cssColor.slice(e.cssColor.indexOf("(") + 1, e.cssColor.indexOf(")")).split(" ");
+      arr.forEach((el, i) => {
+        arr[i] = Math.floor(el);
+      });
+      this.drawingColor = `rgb(${arr.join(", ")})`;
+    },
+
+    SwitchTumbler() {
+      this.isImage = !this.isImage;
     },
   },
 };
@@ -117,7 +254,7 @@ export default {
   &__inner {
     padding: 10px 10px 75px;
     height: 100%;
-    overflow: auto;
+    overflow: visible;
   }
 
   &__box {
@@ -129,6 +266,21 @@ export default {
       justify-content: space-between;
     }
   }
+}
+
+.col:not(:last-child) {
+  margin-bottom: 15px;
+}
+
+.col {
+  position: relative;
+}
+
+.col-layer {
+  padding: 0;
+  justify-content: center;
+  padding-bottom: 15px;
+  border-bottom: 1px solid $dark-grey;
 }
 
 .color-pallete {
@@ -171,6 +323,64 @@ export default {
     border: 2px solid rgba(46, 46, 46, 0.4);
   }
 }
+
+.palet__wrapper {
+  position: relative;
+}
+
+.palet__inner {
+  position: absolute;
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+  border-radius: 0 10px 10px 0;
+  border-left: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 8px 5px 7px 5px;
+  left: 44px;
+  top: 0;
+  z-index: 3;
+
+  &.palette__visible {
+    display: flex;
+    opacity: 1;
+  }
+
+  :deep(svg) {
+    height: 20px;
+    width: 20px;
+    cursor: pointer;
+    fill: $color-icon-btn;
+    transition: fill 0.3s;
+    margin-right: 2px;
+  }
+}
+
+.icon__palette:hover,
+.icon__palette:active {
+  :deep(svg) {
+    fill: white;
+  }
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.4);
+  cursor: not-allowed;
+}
+
+.layer__btn {
+  display: flex;
+  justify-content: center;
+}
+
+.layer__btn.last {
+  justify-content: flex-end;
+}
 </style>
 
 <style lang="scss">
@@ -188,12 +398,6 @@ export default {
   justify-content: center;
   align-items: center;
 }
-
-// .modal-content {
-//   padding: 15px;
-//   background: #fff;
-//   border-radius: 10px;
-// }
 
 .modal__actions {
   margin-top: 15px;
