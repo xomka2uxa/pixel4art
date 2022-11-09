@@ -15,7 +15,7 @@
             <div
               v-for="(item, i) in pallete"
               :key="i"
-              :class="['color-item', item === сhange ? '_active' : '']"
+              :class="['color-item', item === change ? '_active' : '']"
               :style="{ background: item }"
               @click="chooseColorPalette(item)"
             ></div>
