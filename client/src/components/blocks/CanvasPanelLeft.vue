@@ -141,7 +141,7 @@
                 name="minus-thick"
                 class="icon__palette"
                 @click="removeColorInPollete"
-                :disabled="!selectedPaletteForChange || colorPallete.length < 1"
+                :disabled="!selectedPaletteForChange"
               />
             </div>
             <div class="flex-palette">
@@ -155,9 +155,10 @@
                   { void: !item },
                 ]"
                 :style="{ background: item }"
-                @click="addColorPalette(item)"
-              >
-                <mdicon v-if="!item" name="plus-thick" class="icon-palette" />
+                @click="changeColorPalette(item)"
+              ></div>
+              <div class="color-item _palette col-50" @click="addColorPalette">
+                <mdicon name="plus-thick" class="icon-palette" />
               </div>
             </div>
           </div>
@@ -216,12 +217,13 @@ export default {
   },
 
   methods: {
-    addColorPalette(item) {
-      if (!item) {
-        this.$store.dispatch("addColorInPallete", this.selectedColor);
-        this.selectedPaletteForChange = this.selectedColor;
-        console.log(this.selectedPaletteForChange, this.selectedColor);
-      }
+    addColorPalette() {
+      this.$store.dispatch("addColorInPallete", this.selectedColor);
+      this.selectedPaletteForChange = this.selectedColor;
+      console.log(this.selectedPaletteForChange, this.selectedColor);
+    },
+
+    changeColorPalette(item) {
       this.selectedPaletteForChange = item;
       this.$store.dispatch("setSelectedColor", this.selectedPaletteForChange);
     },
@@ -233,8 +235,10 @@ export default {
     },
 
     removeColorInPollete() {
-      this.$store.dispatch("removeColorInPallete", this.selectedColor);
-      this.selectedPaletteForChange = "";
+      if (this.selectedPaletteForChange) {
+        this.$store.dispatch("removeColorInPallete", this.selectedColor);
+        this.selectedPaletteForChange = "";
+      }
     },
 
     chooseColorInPallete(color) {

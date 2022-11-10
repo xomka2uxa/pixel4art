@@ -214,7 +214,7 @@ export default {
               axis: axis,
               direction: direction,
             }),
-          400
+          150
         );
       }
     },
@@ -236,7 +236,7 @@ export default {
   right: 0;
   background-color: $bg-header;
   color: #fff;
-  padding: 15px 0;
+  padding: 7px 0;
   z-index: 5;
   box-shadow: 0 -4px 7px 0 rgba(0, 0, 0, 0.35);
 
