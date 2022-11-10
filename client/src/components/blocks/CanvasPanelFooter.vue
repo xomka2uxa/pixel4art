@@ -67,31 +67,48 @@
           <mdicon name="magnify-plus-outline" />
         </icon-btn>
       </div>
-      <!-- <div class="canvas-panel__box flex">
+      <div class="canvas-panel__box zoom flex">
         <icon-btn
-          isLayer
+          isRound
           isSmall
-          title="Слой с эскизом"
-          class="layer__btn"
-          :class="{ active: isImage }"
-          @click="SwitchTumbler"
+          title="Подвинуть холст вниз"
+          @mousedown="doMovingStart('y', -1)"
+          @mouseup="doMovingEnd"
+          :class="{ disabled: scaleInPrc <= 5 }"
         >
-          <mdicon name="file-image" />
+          <mdicon name="chevron-down" />
         </icon-btn>
-        <div class="tumbler__wrapper" @click="SwitchTumbler">
-          <div class="tumbler" :class="{ image: isImage }"></div>
-        </div>
         <icon-btn
-          isLayer
+          isRound
           isSmall
-          class="layer__btn"
-          title="Слой с рисованием"
-          :class="{ active: !isImage }"
-          @click="SwitchTumbler"
+          title="Подвинуть холст вверх"
+          @mousedown="doMovingStart('y', 1)"
+          @mouseup="doMovingEnd"
+          :class="{ disabled: scaleInPrc >= 200 }"
         >
-          <mdicon name="brush" />
+          <mdicon name="chevron-up" />
         </icon-btn>
-      </div> -->
+        <icon-btn
+          isRound
+          isSmall
+          title="Подвинуть холст влево"
+          @mousedown="doMovingStart('x', 1)"
+          @mouseup="doMovingEnd"
+          :class="{ disabled: scaleInPrc <= 5 }"
+        >
+          <mdicon name="chevron-left" />
+        </icon-btn>
+        <icon-btn
+          isRound
+          isSmall
+          title="Подвинуть холст вправо"
+          @mousedown="doMovingStart('x', -1)"
+          @mouseup="doMovingEnd"
+          :class="{ disabled: scaleInPrc >= 200 }"
+        >
+          <mdicon name="chevron-right" />
+        </icon-btn>
+      </div>
     </div>
     <div class="canvas-panel__inner">
       <div class="canvas-panel__box info">
@@ -118,15 +135,17 @@ export default {
     ModalDelete,
   },
 
-  props: ["historyList", "scaleInPrc"],
+  props: ["historyList", "scaleInPrc", "x", "y", "width", "height", "cheight", "cwidth"],
 
-  emits: ["doScaling"],
+  emits: ["doScaling", "doMoving"],
 
   data() {
     return {
       showModal: false,
       showModalDelete: false,
       showModalInfo: false,
+      doMovingFunc: null,
+      isMoveDisable: false,
     };
   },
 
@@ -176,6 +195,32 @@ export default {
 
     doScaling(direction) {
       this.$emit("doScaling", direction);
+    },
+
+    doMoving(axis, direction) {
+      this.$emit("doMoving", axis, direction);
+      console.log(axis, direction);
+    },
+
+    doMovingStart(axis, direction) {
+      if (!this.isMoveDisable) {
+        this.$emit("doMoving", {
+          axis: axis,
+          direction: direction,
+        });
+        this.doMovingFunc = setInterval(
+          () =>
+            this.$emit("doMoving", {
+              axis: axis,
+              direction: direction,
+            }),
+          400
+        );
+      }
+    },
+
+    doMovingEnd() {
+      clearInterval(this.doMovingFunc);
     },
   },
 };

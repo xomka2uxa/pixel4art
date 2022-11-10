@@ -19,7 +19,18 @@
       @do-scaling="doScaling"
       @replace-color-on-canvas="replaceColorOnCanvas"
     />
-    <canvas-panel-footer :historyList="rectListHistory.actions" :scale-in-prc="scaleInPrc" @do-scaling="doScaling" />
+    <canvas-panel-footer
+      :historyList="rectListHistory.actions"
+      :scale-in-prc="scaleInPrc"
+      :x="gc.x"
+      :y="gc.y"
+      :width="gc.width"
+      :height="gc.height"
+      :cheight="cc.height"
+      :cwidth="cc.width"
+      @do-scaling="doScaling"
+      @do-moving="doMoving"
+    />
     <view-mode-tooltip v-if="isScaleInPrc" />
   </div>
 </template>
@@ -507,6 +518,18 @@ export default {
       }
     },
 
+    doMoving(item) {
+      if (item.axis == "x") {
+        this.gc.x = this.gc.x - 20 * item.direction;
+        console.log(this.gc.x + this.gc.width, this.gc.x, this.gc.width);
+        this.leavePicOnCanvas();
+      }
+      if (item.axis == "y") {
+        this.gc.y = this.gc.y - 20 * item.direction;
+        this.leavePicOnCanvas();
+      }
+    },
+
     handleMouseWheel(e) {
       if (this.isAreaGroup(e.offsetX, e.offsetY)) {
         e.preventDefault();
@@ -569,10 +592,10 @@ export default {
     },
 
     leavePicOnCanvas() {
-      if (this.gc.y + this.gc.height < 50) this.gc.y = 70 - this.gc.height;
-      if (this.gc.x + this.gc.width < 50) this.gc.x = 70 - this.gc.width;
-      if (this.gc.x > this.cc.width - 50) this.gc.x = this.cc.width - 70;
-      if (this.gc.y > this.cc.height - 50) this.gc.y = this.cc.height - 70;
+      if (this.gc.y + this.gc.height < 70) this.gc.y = 70 - this.gc.height;
+      if (this.gc.x + this.gc.width < 150) this.gc.x = 150 - this.gc.width;
+      if (this.gc.x > this.cc.width - 40) this.gc.x = this.cc.width - 40;
+      if (this.gc.y > this.cc.height - 90) this.gc.y = this.cc.height - 90;
     },
 
     timeoutDragStart(x, y) {

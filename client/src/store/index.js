@@ -8,7 +8,7 @@ export default createStore({
 
   state: {
     selectedColor: "rgb(255, 136, 0)",
-    colorPallete: [],
+    colorPallete: ["rgb(57, 9, 93)", "rgb(125, 93, 148)", "rgb(255, 215, 0)", ""],
     currentSizesPaint: [50, 50],
     defaultSizesPaint: {
       xs: [20, 20],
@@ -66,7 +66,7 @@ export default createStore({
 
     addColorInPallete(state, color) {
       if (!state.colorPallete.includes(color)) {
-        state.colorPallete.push(color);
+        state.colorPallete.unshift(color);
       }
     },
 

@@ -33,34 +33,35 @@
             </div>
           </div>
           <div class="col">
-            <Popper placement="right-start">
-              <icon-btn isBgColor title="Загрузить картинку" @click="ShowModalImage">
-                <mdicon name="file-image-plus" />
-              </icon-btn>
-              <template #content="{ close }">
-                <modal-image @close="close" />
-              </template>
-            </Popper>
+            <icon-btn isBgColor title="Загрузить картинку" @click="ShowModalImage">
+              <mdicon name="file-image-plus" />
+            </icon-btn>
+            <vue-final-modal
+              v-model="isShowModalImage"
+              classes="modal-container --right"
+              :lock-scroll="false"
+              content-class="modal-content"
+            >
+              <modal-image @close="isShowModalImage = false" />
+            </vue-final-modal>
           </div>
           <div class="col">
             <div v-if="isImage" class="overlay"></div>
-            <Popper placement="right-start">
-              <icon-btn isBgColor title="Покрасить фон" @click="ShowModalFon">
-                <mdicon name="format-color-fill" />
-              </icon-btn>
-              <template #content="{ close }">
-                <modal-fon
-                  @update-drawing-color="updateDrawingColor"
-                  @choose-color-fon="chooseColorFon"
-                  @close="close"
-                />
-              </template>
-              <template #copy-button>
-                <div title="Заменить цвет" @click="replaceColorOnCanvas">
-                  <mdicon name="content-copy" class="my-mdi" />
-                </div>
-              </template>
-            </Popper>
+            <icon-btn isBgColor title="Покрасить фон" @click="ShowModalFon">
+              <mdicon name="format-color-fill" />
+            </icon-btn>
+            <vue-final-modal
+              v-model="isShowModalFon"
+              classes="modal-container --right"
+              :lock-scroll="false"
+              content-class="modal-content"
+            >
+              <modal-fon
+                @update-drawing-color="updateDrawingColor"
+                @choose-color-fon="chooseColorFon"
+                @close="isShowModalFon = false"
+              />
+            </vue-final-modal>
           </div>
           <div class="col">
             <div v-if="isImage" class="overlay"></div>
@@ -70,48 +71,44 @@
           </div>
           <div class="col">
             <div v-if="isImage" class="overlay"></div>
-            <Popper placement="right-start">
-              <icon-btn isBgColor title="Цвет рисования" @click="ShowModalPouring">
-                <mdicon name="brush" />
-              </icon-btn>
-              <template #content="{ close }">
-                <modal-pouring
-                  @update-drawing-color="updateDrawingColor"
-                  @choose-color="chooseColor"
-                  @close="close"
-                  :drawing="drawingColor"
-                  :selected="selectedColor"
-                />
-              </template>
-              <template #copy-button>
-                <div title="Заменить цвет" @click="replaceColorOnCanvas">
-                  <mdicon name="content-copy" class="my-mdi" />
-                </div>
-              </template>
-            </Popper>
+            <icon-btn isBgColor title="Цвет рисования" @click="ShowModalPouring">
+              <mdicon name="brush" />
+            </icon-btn>
+            <vue-final-modal
+              v-model="isShowModalPouring"
+              classes="modal-container --right"
+              :lock-scroll="false"
+              content-class="modal-content"
+            >
+              <modal-pouring
+                @update-drawing-color="updateDrawingColor"
+                @choose-color="chooseColor"
+                @close="isShowModalPouring = false"
+                :drawing="drawingColor"
+                :selected="selectedColor"
+              />
+            </vue-final-modal>
           </div>
           <div class="col">
             <div v-if="!colorsOnCanvas.length || isImage" class="overlay"></div>
-            <Popper placement="right-start">
-              <icon-btn isBgColor title="Замена цвета" @click="ShowModalChange">
-                <mdicon name="invert-colors" />
-              </icon-btn>
-              <template #content="{ close }">
-                <modal-change
-                  @update-drawing-color="updateDrawingColor"
-                  @choose-color="chooseColor"
-                  @close="close"
-                  :pallete="colorsOnCanvas"
-                  :drawing="drawingColor"
-                  :selected="selectedColor"
-                />
-              </template>
-              <template #copy-button>
-                <div title="Заменить цвет" @click="replaceColorOnCanvas">
-                  <mdicon name="content-copy" class="my-mdi" />
-                </div>
-              </template>
-            </Popper>
+            <icon-btn isBgColor title="Замена цвета" @click="ShowModalChange">
+              <mdicon name="invert-colors" />
+            </icon-btn>
+            <vue-final-modal
+              v-model="isShowModalChange"
+              classes="modal-container --right"
+              :lock-scroll="false"
+              content-class="modal-content"
+            >
+              <modal-change
+                @update-drawing-color="updateDrawingColor"
+                @choose-color="chooseColor"
+                @close="isShowModalChange = false"
+                :pallete="colorsOnCanvas"
+                :drawing="drawingColor"
+                :selected="selectedColor"
+              />
+            </vue-final-modal>
           </div>
           <div class="col">
             <div v-if="isImage" class="overlay"></div>
@@ -119,9 +116,49 @@
               <mdicon name="palette" />
             </icon-btn>
             <div class="palet__inner flex" :class="{ palette__visible: isPalette }">
-              <mdicon title="Добавить цвет" name="plus-thick" class="icon__palette" />
-              <mdicon title="Удалить цвет" name="minus-thick" class="icon__palette" />
-              <mdicon title="Заменить цвет" name="invert-colors" class="icon__palette" />
+              <mdicon
+                title="Добавить цвет"
+                name="plus-thick"
+                class="icon__palette"
+                @click="isShowModalAddPalette = true"
+              />
+              <vue-final-modal
+                v-model="isShowModalAddPalette"
+                classes="modal-container --right"
+                :lock-scroll="false"
+                content-class="modal-content"
+              >
+                <modal-add-palette
+                  @update-drawing-color="addColorToPalette"
+                  @choose-color="chooseColor"
+                  @close="isShowModalAddPalette = false"
+                  :drawing="drawingColor"
+                  :selected="selectedColor"
+                />
+              </vue-final-modal>
+              <mdicon
+                title="Удалить цвет"
+                name="minus-thick"
+                class="icon__palette"
+                @click="removeColorInPollete"
+                :disabled="!selectedPaletteForChange || colorPallete.length < 1"
+              />
+            </div>
+            <div class="flex-palette">
+              <div
+                v-for="(item, i) in colorPallete"
+                :key="i"
+                :class="[
+                  'color-item _palette',
+                  'col-50',
+                  item === selectedPaletteForChange ? '_active' : '',
+                  { void: !item },
+                ]"
+                :style="{ background: item }"
+                @click="addColorPalette(item)"
+              >
+                <mdicon v-if="!item" name="plus-thick" class="icon-palette" />
+              </div>
             </div>
           </div>
         </div>
@@ -132,23 +169,23 @@
 
 <script>
 import { mapGetters } from "vuex";
-import Popper from "vue3-popper";
 import IconBtn from "@/components/ui/IconBtn.vue";
 import ModalPouring from "@/components/ui/ModalPouring.vue";
 import ModalFon from "@/components/ui/ModalFon.vue";
 import ModalChange from "@/components/ui/ModalChange.vue";
 import ModalImage from "@/components/ui/ModalImage.vue";
+import ModalAddPalette from "@/components/ui/ModalAddPalette.vue";
 
 export default {
   inject: ["mq"],
 
   components: {
-    Popper,
     IconBtn,
     ModalPouring,
     ModalFon,
     ModalImage,
     ModalChange,
+    ModalAddPalette,
   },
 
   props: ["colorsOnCanvas"],
@@ -158,6 +195,7 @@ export default {
   data() {
     return {
       isShowModalPouring: false,
+      isShowModalAddPalette: false,
       isShowModalFon: false,
       isShowModalImage: false,
       isShowModalChange: false,
@@ -167,6 +205,7 @@ export default {
       isNested: false,
       // selectedColorForChange: "",
       selectedNewColorForChange: "",
+      selectedPaletteForChange: "",
     };
   },
 
@@ -177,6 +216,31 @@ export default {
   },
 
   methods: {
+    addColorPalette(item) {
+      if (!item) {
+        this.$store.dispatch("addColorInPallete", this.selectedColor);
+        this.selectedPaletteForChange = this.selectedColor;
+        console.log(this.selectedPaletteForChange, this.selectedColor);
+      }
+      this.selectedPaletteForChange = item;
+      this.$store.dispatch("setSelectedColor", this.selectedPaletteForChange);
+    },
+
+    addColorToPalette() {
+      this.$store.dispatch("addColorInPallete", this.drawingColor);
+      this.$store.dispatch("setSelectedColor", this.drawingColor);
+      this.selectedPaletteForChange = this.drawingColor;
+    },
+
+    removeColorInPollete() {
+      this.$store.dispatch("removeColorInPallete", this.selectedColor);
+      this.selectedPaletteForChange = "";
+    },
+
+    chooseColorInPallete(color) {
+      this.$store.dispatch("setSelectedColor", color);
+    },
+
     ShowInnerPalette() {
       this.isPalette = !this.isPalette;
       this.isNested = !this.isNested;
@@ -206,6 +270,7 @@ export default {
     updateDrawingColor() {
       this.$store.dispatch("setSelectedColor", this.drawingColor);
       this.isShowModalPouring = false;
+      this.selectedPaletteForChange = "";
     },
 
     chooseColorFon(e) {
@@ -324,8 +389,18 @@ export default {
   }
 }
 
+.color-item._palette {
+  &._active {
+    border: 2px solid rgb(189, 0, 198);
+  }
+  &.void._active {
+    border: none;
+  }
+}
+
 .palet__wrapper {
   position: relative;
+  margin-bottom: 10px;
 }
 
 .palet__inner {
@@ -350,8 +425,15 @@ export default {
     width: 17px;
     cursor: pointer;
     fill: $color-icon-btn;
-    transition: fill 0.3s;
+    transition: fill 0.3s, opacity 0.3s;
     margin-right: 2px;
+  }
+
+  [disabled="true"] {
+    :deep(svg) {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
   }
 }
 
@@ -359,6 +441,12 @@ export default {
 .icon__palette:active {
   :deep(svg) {
     fill: white;
+  }
+
+  &[disabled="true"] {
+    :deep(svg) {
+      fill: $color-icon-btn;
+    }
   }
 }
 
@@ -380,6 +468,45 @@ export default {
 
 .layer__btn.last {
   justify-content: flex-end;
+}
+
+.flex-palette {
+  display: flex;
+  position: relative;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  padding-right: 5px;
+}
+
+.color-item {
+  margin-bottom: 5px;
+  border-radius: 2px;
+}
+
+.void {
+  background: $bg-icon-btn;
+  position: relative;
+  transition: background 0.3s;
+}
+
+.icon-palette {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  :deep(svg) {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+.void:hover,
+.void:active {
+  background: $color-icon-btn;
+  :deep(svg) {
+    fill: white;
+  }
 }
 </style>
 
