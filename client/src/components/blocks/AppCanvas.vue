@@ -44,7 +44,6 @@ import CanvasPanelLeft from "@/components/blocks/CanvasPanelLeft.vue";
 import ViewModeTooltip from "@/components/blocks/ViewModeTooltip.vue";
 /*
 Задачи
-Усли модалка открыта, то на холсте не рисуем???
 3. События мобилы
 4. Делать адаптив
 открытие модлок по быстрым клавишам
@@ -106,6 +105,9 @@ export default {
       isScaleInPrc: false,
       colorsOnCanvas: [],
       drawRectXY: { x: 0, y: 0 },
+      lastDist: null,
+      duration: true,
+      setTime: false,
     };
   },
 
@@ -441,24 +443,66 @@ export default {
     handleCanvasEventTouchMove(e) {
       console.log(e);
       e.preventDefault();
-      let x = Math.floor(e.touches[0].pageX);
-      let y = Math.floor(e.touches[0].pageY);
-      const areaGroup = this.isAreaGroup(x, y);
-      if (areaGroup) {
-        this.timeoutDragStop();
-        this.isBeginMove = false;
-        if (this.isDragging) {
-          this.gc.x = x - this.cc.shiftX;
-          this.gc.y = y - this.cc.shiftY;
-          this.leavePicOnCanvas();
-        } else {
-          if (!this.beginMovePaint) this.beginMovePaint = true;
-          this.drawRect(x, y);
+      let touch1 = e.touches[0];
+      let touch2 = e.touches[1];
+
+      if (e.touches.length == 1) {
+        let x1 = Math.floor(touch1.pageX);
+        let y1 = Math.floor(touch1.pageY);
+        const areaGroup = this.isAreaGroup(x1, y1);
+        if (areaGroup) {
+          this.timeoutDragStop();
+          this.isBeginMove = false;
+          if (this.isDragging) {
+            this.gc.x = x1 - this.cc.shiftX;
+            this.gc.y = y1 - this.cc.shiftY;
+            this.leavePicOnCanvas();
+            console.log(11);
+          } else {
+            if (!this.beginMovePaint) this.beginMovePaint = true;
+            console.log(22);
+            this.drawRect(x1, y1);
+          }
+        }
+      }
+      if (e.touches.length == 2) {
+        if (this.setTime) {
+          setTimeout(() => {
+            this.duration = true;
+          }, 300);
+          this.setTime = false;
+        }
+
+        if (this.duration) {
+          let p1 = {
+            x: Math.floor(touch1.pageX),
+            y: Math.floor(touch1.pageY),
+          };
+          let p2 = {
+            x: Math.floor(touch2.pageX),
+            y: Math.floor(touch2.pageY),
+          };
+
+          let dist = this.getDistance(p1, p2);
+
+          if (!this.lastDist) {
+            this.lastDist = dist;
+          }
+          const direction = dist / this.lastDist > 1 ? 1 : -1;
+          this.setNewScale(direction);
+          this.duration = false;
+          this.setTime = true;
+          this.lastDist = dist;
         }
       }
     },
 
+    getDistance(p1, p2) {
+      return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
+    },
+
     handleCanvasEventTouchEnd() {
+      this.lastDist = 0;
       const areaGroup = this.isAreaGroup(Math.floor(this.drawRectXY.x), Math.floor(this.drawRectXY.y));
       if (areaGroup) {
         if (this.isBeginMove) {
