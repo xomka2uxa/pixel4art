@@ -181,29 +181,30 @@ h2 {
 }
 
 .tumbler__wrapper {
-  background: $bg-icon-btn;
+  background: #4d226d;
   border-radius: 10px;
   cursor: pointer;
   transition: background 0.35s;
   padding: 2px;
-  margin-top: 5px;
+  width: 50px;
+  margin-left: 10px;
+  margin-right: 10px;
 }
 
 .tumbler {
   border-radius: 50%;
-  background-color: $color-icon-btn;
-  transition: translateX 0.4s, background-color 0.35s;
+  background: white;
+  transition: translateX 0.4s, background 0.35s;
   width: 17px;
   height: 17px;
-  transform: translateX(40px);
+  transform: translateX(28px);
 }
 
 .tumbler__wrapper:hover,
 .tumbler__wrapper:active {
-  background: linear-gradient(to right, $color1-gold-gradient, $color2-gold-gradient);
 
   .tumbler {
-    background-color: white;
+    background: linear-gradient(to right, $color1-gold-gradient, $color2-gold-gradient);
   }
 }
 

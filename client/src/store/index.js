@@ -23,11 +23,16 @@ export default createStore({
     isReturnFromHistoryList: false,
     cntHistoryAction: 0,
     historyMode: false,
+    isImage: false,
   },
 
   getters: {
     selectedColor(state) {
       return state.selectedColor;
+    },
+
+    isImage(state) {
+      return state.isImage;
     },
 
     colorPallete(state) {
@@ -62,6 +67,10 @@ export default createStore({
   mutations: {
     setSelectedColor(state, color) {
       state.selectedColor = color;
+    },
+
+    SwitchTumbler(state, flag) {
+      state.isImage = flag;
     },
 
     addColorInPallete(state, color) {
@@ -123,6 +132,10 @@ export default createStore({
   actions: {
     setSelectedColor({ commit }, color) {
       commit("setSelectedColor", color);
+    },
+
+    SwitchTumbler({ commit }, flag) {
+      commit("SwitchTumbler", flag);
     },
 
     addColorInPallete({ commit }, color) {

@@ -109,6 +109,17 @@
           <mdicon name="chevron-right" />
         </icon-btn>
       </div>
+      <div class="canvas-panel__box zoom flex">
+        <icon-btn isLayer isSmall title="Слой с эскизом" class="layer__btn" :class="{ active: isImage }">
+          <mdicon name="file-image" />
+        </icon-btn>
+        <div class="tumbler__wrapper" @click="SwitchTumbler">
+          <div class="tumbler" :class="{ image: isImage }"></div>
+        </div>
+        <icon-btn isLayer isSmall class="layer__btn" title="Слой с рисованием" :class="{ active: !isImage }">
+          <mdicon name="brush" />
+        </icon-btn>
+      </div>
     </div>
     <div class="canvas-panel__inner">
       <div class="canvas-panel__box info">
@@ -127,6 +138,7 @@
 import IconBtn from "@/components/ui/IconBtn.vue";
 import ModalResize from "@/components/ui/ModalResize.vue";
 import ModalDelete from "@/components/ui/ModalDelete.vue";
+import { mapGetters } from "vuex";
 
 export default {
   components: {
@@ -158,6 +170,8 @@ export default {
       let user = this.historyList.find((item) => item.isHistory == true);
       return user == undefined ? true : false;
     },
+
+    ...mapGetters(["isImage"]),
   },
 
   methods: {
@@ -221,6 +235,10 @@ export default {
 
     doMovingEnd() {
       clearInterval(this.doMovingFunc);
+    },
+
+    SwitchTumbler() {
+      this.$store.dispatch("SwitchTumbler", !this.isImage);
     },
   },
 };

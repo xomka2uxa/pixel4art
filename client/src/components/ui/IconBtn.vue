@@ -105,8 +105,9 @@ export default {
 }
 
 .layer {
+  cursor: auto;
   &.icon-btn__inner :deep(svg) {
-    fill: $color-icon-btn;
+    fill: white;
     opacity: 0.5;
     transition: opacity 0.35s fill 0.35s;
   }
@@ -167,12 +168,6 @@ export default {
 
     &.icon-btn__inner :deep(svg) {
       fill: $bg-header;
-    }
-  }
-
-  .layer {
-    &.icon-btn__inner :deep(svg) {
-      opacity: 1;
     }
   }
 }

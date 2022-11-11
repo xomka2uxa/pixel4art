@@ -3,7 +3,7 @@
     <div class="left-sidebar__inner">
       <div class="left-sidebar__box choose-color">
         <div class="flex-center">
-          <div class="col col-layer">
+          <!-- <div class="col col-layer">
             <div class="flex-center">
               <transition name="fade" mode="out-in">
                 <icon-btn
@@ -31,10 +31,24 @@
             <div class="tumbler__wrapper" @click="SwitchTumbler">
               <div class="tumbler" :class="{ image: isImage }"></div>
             </div>
-          </div>
+          </div> -->
           <div class="col">
             <icon-btn isBgColor title="Загрузить картинку" @click="ShowModalImage">
-              <mdicon name="file-image-plus" />
+              <mdicon name="image-plus" />
+            </icon-btn>
+            <vue-final-modal
+              v-model="isShowModalImage"
+              classes="modal-container --right"
+              :lock-scroll="false"
+              content-class="modal-content"
+            >
+              <modal-image @close="isShowModalImage = false" />
+            </vue-final-modal>
+          </div>
+          <div class="col">
+            <div v-if="!isImage" class="overlay"></div>
+            <icon-btn isBgColor title="Изменить картинку" @click="ShowModalImage">
+              <mdicon name="image-edit" />
             </icon-btn>
             <vue-final-modal
               v-model="isShowModalImage"
@@ -148,16 +162,11 @@
               <div
                 v-for="(item, i) in colorPallete"
                 :key="i"
-                :class="[
-                  'color-item _palette',
-                  'col-50',
-                  item === selectedPaletteForChange ? '_active' : '',
-                  { void: !item },
-                ]"
+                :class="['color-item _palette', 'col-50', item === selectedPaletteForChange ? '_active' : '']"
                 :style="{ background: item }"
                 @click="changeColorPalette(item)"
               ></div>
-              <div class="color-item _palette col-50" @click="addColorPalette">
+              <div class="color-item _palette col-50 void" @click="addColorPalette">
                 <mdicon name="plus-thick" class="icon-palette" />
               </div>
             </div>
@@ -201,7 +210,6 @@ export default {
       isShowModalImage: false,
       isShowModalChange: false,
       drawingColor: "",
-      isImage: false,
       isPalette: false,
       isNested: false,
       // selectedColorForChange: "",
@@ -211,7 +219,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters(["selectedColor", "colorPallete"]),
+    ...mapGetters(["selectedColor", "colorPallete", "isImage"]),
 
     ...mapGetters("header", ["isHeaderHidden"]),
   },
@@ -249,6 +257,11 @@ export default {
       this.isPalette = !this.isPalette;
       this.isNested = !this.isNested;
     },
+
+    // HideInnerPalette() {
+    //   this.isPalette = false;
+    //   this.isNested = false;
+    // },
 
     ShowModalChange() {
       this.isShowModalChange = true;
@@ -292,10 +305,6 @@ export default {
         arr[i] = Math.floor(el);
       });
       this.drawingColor = `rgb(${arr.join(", ")})`;
-    },
-
-    SwitchTumbler() {
-      this.isImage = !this.isImage;
     },
   },
 };
