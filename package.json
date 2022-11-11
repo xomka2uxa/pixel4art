@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "click-outside-vue3": "^4.0.1"
+  }
+}

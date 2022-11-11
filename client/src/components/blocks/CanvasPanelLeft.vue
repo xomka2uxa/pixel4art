@@ -43,21 +43,29 @@
               content-class="modal-content"
             >
               <modal-image @close="isShowModalImage = false" />
+              ldfff
             </vue-final-modal>
           </div>
-          <div class="col">
+          <div class="col" v-click-outside="HideInnerImageWork">
             <div v-if="!isImage" class="overlay"></div>
-            <icon-btn isBgColor title="Изменить картинку" @click="ShowModalImage">
+            <icon-btn isBgColor :isNested="isNestedImage" title="Работа с картинкой" @click="ShowInnerImageWork">
               <mdicon name="image-edit" />
             </icon-btn>
-            <vue-final-modal
-              v-model="isShowModalImage"
-              classes="modal-container --right"
-              :lock-scroll="false"
-              content-class="modal-content"
-            >
-              <modal-image @close="isShowModalImage = false" />
-            </vue-final-modal>
+            <div class="palet__inner flex" :class="{ palette__visible: isImageWork }">
+              <mdicon title="Удалить картинку" name="minus-thick" class="icon__palette" @click="ShowModalDeleteImage" />
+              <vue-final-modal v-model="showModalDeleteImage" classes="modal-container" content-class="modal-content">
+                <modal-delete-image @close="showModalDeleteImage = false" />
+              </vue-final-modal>
+              <mdicon title="Добавить цвет" name="plus-thick" class="icon__palette" @click="ShowModalImageWork" />
+              <vue-final-modal
+                v-model="isShowModalImageWork"
+                classes="modal-container --right"
+                :lock-scroll="false"
+                content-class="modal-content"
+              >
+                <modal-image-work @close="isShowModalImageWork = false" />
+              </vue-final-modal>
+            </div>
           </div>
           <div class="col">
             <div v-if="isImage" class="overlay"></div>
@@ -124,7 +132,7 @@
               />
             </vue-final-modal>
           </div>
-          <div class="col">
+          <div class="col" v-click-outside="HideInnerPalette">
             <div v-if="isImage" class="overlay"></div>
             <icon-btn isBgColor :isNested="isNested" title="Палитра" @click="ShowInnerPalette" class="palet__wrapper">
               <mdicon name="palette" />
@@ -184,7 +192,10 @@ import ModalPouring from "@/components/ui/ModalPouring.vue";
 import ModalFon from "@/components/ui/ModalFon.vue";
 import ModalChange from "@/components/ui/ModalChange.vue";
 import ModalImage from "@/components/ui/ModalImage.vue";
+import ModalImageWork from "@/components/ui/ModalImageWork.vue";
 import ModalAddPalette from "@/components/ui/ModalAddPalette.vue";
+import ModalDeleteImage from "@/components/ui/ModalDeleteImage.vue";
+import vClickOutside from "click-outside-vue3";
 
 export default {
   inject: ["mq"],
@@ -196,6 +207,12 @@ export default {
     ModalImage,
     ModalChange,
     ModalAddPalette,
+    ModalDeleteImage,
+    ModalImageWork,
+  },
+
+  directives: {
+    clickOutside: vClickOutside.directive,
   },
 
   props: ["colorsOnCanvas"],
@@ -208,10 +225,14 @@ export default {
       isShowModalAddPalette: false,
       isShowModalFon: false,
       isShowModalImage: false,
+      isShowModalImageWork: false,
       isShowModalChange: false,
+      showModalDeleteImage: false,
       drawingColor: "",
       isPalette: false,
       isNested: false,
+      isNestedImage: false,
+      isImageWork: false,
       // selectedColorForChange: "",
       selectedNewColorForChange: "",
       selectedPaletteForChange: "",
@@ -225,6 +246,10 @@ export default {
   },
 
   methods: {
+    ShowModalDeleteImage() {
+      this.showModalDeleteImage = true;
+    },
+
     addColorPalette() {
       this.$store.dispatch("addColorInPallete", this.selectedColor);
       this.selectedPaletteForChange = this.selectedColor;
@@ -258,10 +283,20 @@ export default {
       this.isNested = !this.isNested;
     },
 
-    // HideInnerPalette() {
-    //   this.isPalette = false;
-    //   this.isNested = false;
-    // },
+    HideInnerPalette() {
+      this.isPalette = false;
+      this.isNested = false;
+    },
+
+    HideInnerImageWork() {
+      this.isImageWork = false;
+      this.isNestedImage = false;
+    },
+
+    ShowInnerImageWork() {
+      this.isImageWork = !this.isImageWork;
+      this.isNestedImage = !this.isNestedImage;
+    },
 
     ShowModalChange() {
       this.isShowModalChange = true;
@@ -273,6 +308,10 @@ export default {
 
     ShowModalImage() {
       this.isShowModalImage = true;
+    },
+
+    ShowModalImageWork() {
+      this.isShowModalImageWork = true;
     },
 
     ShowModalFon() {
