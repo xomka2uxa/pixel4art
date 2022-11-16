@@ -1,5 +1,12 @@
 <template>
   <div>
+    <!-- <div class="debug-panel">
+      <div>touches: {{ touches }}</div>
+      <div>beginMovePaint: {{ beginMovePaint }}</div>
+      <div>isBeginMove: {{ isBeginMove }}</div>
+      <div>isDragging: {{ isDragging }}</div>
+      <div>isClick: {{ isClick }}</div>
+    </div> -->
     <div class="container-canvas" ref="containerCanvas">
       <canvas id="cl" ref="cl" class="canvas"></canvas>
       <canvas
@@ -108,6 +115,7 @@ export default {
       lastDist: null,
       duration: true,
       setTime: false,
+      touches: [],
     };
   },
 
@@ -425,12 +433,13 @@ export default {
     },
 
     handleCanvasEventTouchStart(e) {
+      this.touches = e.touches;
       e.preventDefault();
       this.drawRectXY.x = Math.floor(e.touches[0].pageX);
       this.drawRectXY.y = Math.floor(e.touches[0].pageY);
       const areaGroup = this.isAreaGroup(this.drawRectXY.x, this.drawRectXY.y);
 
-      if (areaGroup) {
+      if (areaGroup && e.touches.length == 1) {
         this.isBeginMove = true;
         this.cc.isClick = true;
         this.timeoutDragStart(this.drawRectXY.x, this.drawRectXY.y);
@@ -447,6 +456,7 @@ export default {
       let touch2 = e.touches[1];
 
       if (e.touches.length == 1) {
+        this.touches = e.touches;
         let x1 = Math.floor(touch1.pageX);
         let y1 = Math.floor(touch1.pageY);
         const areaGroup = this.isAreaGroup(x1, y1);
@@ -466,6 +476,10 @@ export default {
         }
       }
       if (e.touches.length == 2) {
+        this.touches = e.touches;
+        this.timeoutDragStop();
+        this.isBeginMove = false;
+        this.isDragging = false;
         if (this.setTime) {
           setTimeout(() => {
             this.duration = true;
@@ -697,6 +711,20 @@ export default {
     position: absolute;
     top: 0;
     left: 0;
+  }
+}
+.debug-panel {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  z-index: 1000;
+  background: antiquewhite;
+  padding: 2px;
+
+  div {
+    width: 33%;
+    padding: 0 10px;
   }
 }
 </style>
