@@ -117,6 +117,7 @@
               <mdicon name="invert-colors" />
             </icon-btn>
             <vue-final-modal
+              v-if="isShowModalChange"
               v-model="isShowModalChange"
               classes="modal-container --right"
               :lock-scroll="false"
@@ -124,12 +125,9 @@
             >
               <modal-change
                 @replace-color-on-canvas="replaceColorOnCanvas"
-                @choose-color-palette="chooseColorForReplace"
-                @choose-color-for-change="chooseColorForChange"
                 @close="isShowModalChange = false"
                 :pallete="colorsOnCanvas"
                 :drawing="drawingColor"
-                :choosen-color="selectedNewColorForChange"
               />
             </vue-final-modal>
           </div>
@@ -235,7 +233,6 @@ export default {
       isNestedImage: false,
       isImageWork: false,
       selectedColorForChange: "",
-      selectedNewColorForChange: "",
       selectedPaletteForChange: "",
     };
   },
@@ -347,21 +344,11 @@ export default {
       this.drawingColor = `rgb(${arr.join(", ")})`;
     },
 
-    replaceColorOnCanvas() {
-      if (this.selectedColorForChange && this.selectedColorForChange !== this.selectedNewColorForChange) {
-        this.$emit("replaceColorOnCanvas", {
-          oldColor: this.selectedColorForChange,
-          newColor: this.selectedNewColorForChange,
-        });
-        console.log(this.selectedColorForChange, this.selectedNewColorForChange, 66);
-        this.selectedColorForChange = this.selectedNewColorForChange;
-      }
-    },
-    chooseColorForChange(e) {
-      this.selectedNewColorForChange = e;
-    },
-    chooseColorForReplace(e) {
-      this.selectedColorForChange = e;
+    replaceColorOnCanvas({ newColor, oldColor }) {
+      this.$emit("replaceColorOnCanvas", {
+        oldColor,
+        newColor,
+      });
     },
   },
 };

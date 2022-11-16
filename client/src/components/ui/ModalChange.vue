@@ -16,7 +16,7 @@
               :key="i"
               :class="['color-item', item === change ? '_active' : '']"
               :style="{ background: item }"
-              @click="chooseColorPalette(item)"
+              @click="chooseOldColor(item)"
             ></div>
           </div>
         </div>
@@ -51,7 +51,7 @@
               default-format="rgb"
               :visible-formats="['hex']"
               alpha-channel="hide"
-              @color-change="chooseColorForChange(e)"
+              @color-change="chooseNewcolor"
             >
             </ColorPicker>
           </div>
@@ -76,18 +76,15 @@ import { ColorPicker } from "vue-accessible-color-picker";
 export default {
   emits: {
     close: null,
-    chooseColor: null,
     replaceColorOnCanvas: null,
-    chooseColorPalette: null,
-    chooseColorForChange: null,
   },
 
   props: ["drawing", "pallete", "choosenColor"],
 
   data() {
     return {
-      selectedNewColorForChange: "",
-      change: "",
+      change: null,
+      newColor: null,
     };
   },
 
@@ -95,22 +92,20 @@ export default {
     ColorPicker,
   },
 
+  mounted() {
+    this.change = this.pallete[0];
+  },
+
   computed: {
     ...mapGetters(["getSizePaint", "currentSizesPaint", "defaultSizesPaint"]),
   },
 
   methods: {
-    updateDrawingColor() {
-      this.$emit("updateDrawingColor");
-      this.$emit("close");
+    chooseNewcolor(e) {
+      this.newColor = e.cssColor;
     },
 
-    chooseColorForChange(e) {
-      this.$emit("chooseColorForChange", e);
-    },
-
-    chooseColorPalette(color) {
-      this.$emit("chooseColorPalette", color);
+    chooseOldColor(color) {
       this.change = color;
     },
 
@@ -119,7 +114,7 @@ export default {
     },
 
     replaceColorOnCanvas() {
-      this.$emit("replaceColorOnCanvas");
+      this.$emit("replaceColorOnCanvas", { newColor: this.newColor, oldColor: this.change });
       this.$emit("close");
     },
   },
