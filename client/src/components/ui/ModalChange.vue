@@ -8,7 +8,6 @@
       <div class="current-size">
         <div class="inner__title">
           <span>Цвет для замены</span>
-          {{ change }}
         </div>
         <div class="inner__content">
           <div v-if="pallete.length" class="__body color-list flex">
@@ -31,11 +30,11 @@
             <div class="flex__center colors__wrapper">
               <div class="flex">
                 <p class="color_name modal-container">Текущий цвет</p>
-                <div class="colors__inner" :style="{ background: drawing }"></div>
+                <div class="colors__inner" :style="{ background: change }"></div>
               </div>
               <div class="flex">
                 <p class="color_name modal-container">Новый цвет:</p>
-                <div class="colors__inner" :style="{ background: drawing }"></div>
+                <div class="colors__inner" :style="{ background: choosenColor }"></div>
               </div>
             </div>
           </div>
@@ -52,7 +51,7 @@
               default-format="rgb"
               :visible-formats="['hex']"
               alpha-channel="hide"
-              @color-change="chooseColor"
+              @color-change="chooseColorForChange(e)"
             >
             </ColorPicker>
           </div>
@@ -60,7 +59,7 @@
       </div>
       <div class="buttons">
         <div class="col-50">
-          <button @click="updateDrawingColor" class="test-btn btn-modal">OK</button>
+          <button @click="replaceColorOnCanvas" class="test-btn btn-modal">OK</button>
         </div>
         <div class="col-50">
           <button class="test-btn btn-modal" @click="$emit('close')">ОТМЕНА</button>
@@ -78,15 +77,17 @@ export default {
   emits: {
     close: null,
     chooseColor: null,
-    updateDrawingColor: null,
+    replaceColorOnCanvas: null,
+    chooseColorPalette: null,
+    chooseColorForChange: null,
   },
 
-  props: ["drawing", "selected", "pallete"],
+  props: ["drawing", "pallete", "choosenColor"],
 
   data() {
     return {
-      change: "",
       selectedNewColorForChange: "",
+      change: "",
     };
   },
 
@@ -104,15 +105,21 @@ export default {
       this.$emit("close");
     },
 
-    chooseColor(e) {
-      this.$emit("chooseColor", e);
+    chooseColorForChange(e) {
+      this.$emit("chooseColorForChange", e);
     },
 
     chooseColorPalette(color) {
+      this.$emit("chooseColorPalette", color);
       this.change = color;
     },
 
     closeModal() {
+      this.$emit("close");
+    },
+
+    replaceColorOnCanvas() {
+      this.$emit("replaceColorOnCanvas");
       this.$emit("close");
     },
   },

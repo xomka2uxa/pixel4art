@@ -51,20 +51,20 @@
             <icon-btn isBgColor :isNested="isNestedImage" title="Работа с картинкой" @click="ShowInnerImageWork">
               <mdicon name="image-edit" />
             </icon-btn>
+            <vue-final-modal
+              v-model="isShowModalImageWork"
+              classes="modal-container --right"
+              :lock-scroll="false"
+              content-class="modal-content"
+            >
+              <modal-image-work @close="isShowModalImageWork = false" />
+            </vue-final-modal>
             <div class="palet__inner flex" :class="{ palette__visible: isImageWork }">
-              <mdicon title="Удалить картинку" name="minus-thick" class="icon__palette" @click="ShowModalDeleteImage" />
+              <mdicon title="Удалить" name="minus-thick" class="icon__palette" @click="ShowModalDeleteImage" />
               <vue-final-modal v-model="showModalDeleteImage" classes="modal-container" content-class="modal-content">
                 <modal-delete-image @close="showModalDeleteImage = false" />
               </vue-final-modal>
-              <mdicon title="Добавить цвет" name="plus-thick" class="icon__palette" @click="ShowModalImageWork" />
-              <vue-final-modal
-                v-model="isShowModalImageWork"
-                classes="modal-container --right"
-                :lock-scroll="false"
-                content-class="modal-content"
-              >
-                <modal-image-work @close="isShowModalImageWork = false" />
-              </vue-final-modal>
+              <mdicon title="Редактировать" name="pencil" class="icon__palette" @click="ShowModalImageWork" />
             </div>
           </div>
           <div class="col">
@@ -123,12 +123,13 @@
               content-class="modal-content"
             >
               <modal-change
-                @update-drawing-color="updateDrawingColor"
-                @choose-color="chooseColor"
+                @replace-color-on-canvas="replaceColorOnCanvas"
+                @choose-color-palette="chooseColorForReplace"
+                @choose-color-for-change="chooseColorForChange"
                 @close="isShowModalChange = false"
                 :pallete="colorsOnCanvas"
                 :drawing="drawingColor"
-                :selected="selectedColor"
+                :choosen-color="selectedNewColorForChange"
               />
             </vue-final-modal>
           </div>
@@ -137,6 +138,20 @@
             <icon-btn isBgColor :isNested="isNested" title="Палитра" @click="ShowInnerPalette" class="palet__wrapper">
               <mdicon name="palette" />
             </icon-btn>
+            <vue-final-modal
+              v-model="isShowModalAddPalette"
+              classes="modal-container --right"
+              :lock-scroll="false"
+              content-class="modal-content"
+            >
+              <modal-add-palette
+                @update-drawing-color="addColorToPalette"
+                @choose-color="chooseColor"
+                @close="isShowModalAddPalette = false"
+                :drawing="drawingColor"
+                :selected="selectedColor"
+              />
+            </vue-final-modal>
             <div class="palet__inner flex" :class="{ palette__visible: isPalette }">
               <mdicon
                 title="Добавить цвет"
@@ -144,20 +159,6 @@
                 class="icon__palette"
                 @click="isShowModalAddPalette = true"
               />
-              <vue-final-modal
-                v-model="isShowModalAddPalette"
-                classes="modal-container --right"
-                :lock-scroll="false"
-                content-class="modal-content"
-              >
-                <modal-add-palette
-                  @update-drawing-color="addColorToPalette"
-                  @choose-color="chooseColor"
-                  @close="isShowModalAddPalette = false"
-                  :drawing="drawingColor"
-                  :selected="selectedColor"
-                />
-              </vue-final-modal>
               <mdicon
                 title="Удалить цвет"
                 name="minus-thick"
@@ -233,7 +234,7 @@ export default {
       isNested: false,
       isNestedImage: false,
       isImageWork: false,
-      // selectedColorForChange: "",
+      selectedColorForChange: "",
       selectedNewColorForChange: "",
       selectedPaletteForChange: "",
     };
@@ -344,6 +345,23 @@ export default {
         arr[i] = Math.floor(el);
       });
       this.drawingColor = `rgb(${arr.join(", ")})`;
+    },
+
+    replaceColorOnCanvas() {
+      if (this.selectedColorForChange && this.selectedColorForChange !== this.selectedNewColorForChange) {
+        this.$emit("replaceColorOnCanvas", {
+          oldColor: this.selectedColorForChange,
+          newColor: this.selectedNewColorForChange,
+        });
+        console.log(this.selectedColorForChange, this.selectedNewColorForChange, 66);
+        this.selectedColorForChange = this.selectedNewColorForChange;
+      }
+    },
+    chooseColorForChange(e) {
+      this.selectedNewColorForChange = e;
+    },
+    chooseColorForReplace(e) {
+      this.selectedColorForChange = e;
     },
   },
 };
@@ -478,7 +496,7 @@ export default {
     cursor: pointer;
     fill: $color-icon-btn;
     transition: fill 0.3s, opacity 0.3s;
-    margin-right: 2px;
+    margin-right: 5px;
   }
 
   [disabled="true"] {

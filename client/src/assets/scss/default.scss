@@ -10,11 +10,15 @@ body {
   padding: 0;
   font-size: 1rem;
 }
+
 .wrapper {
   overflow: hidden;
   position: relative;
   width: 100%;
-  min-height: 100vh;
+  height: 100%;
+  height: -moz-available;
+  height: -webkit-fill-available;
+  height: fill-available;
 }
 
 button {
@@ -210,4 +214,33 @@ h2 {
 
 .tumbler.image {
   transform: translateX(0);
+}
+
+.vue-slider-process {
+  background-color: #FBC221;
+}
+
+.vue-slider:hover .vue-slider-process {
+  background-color: #fbb221;
+}
+
+.vue-slider-dot-handle-focus {
+  border-color: #FBC221;
+  box-shadow: 0 0 0 5px rgb(251 194 33 / 20%);
+}
+
+.vue-slider-dot-handle {
+  border: 2px solid #FBC221;
+}
+
+.vue-slider-dot-handle:hover {
+  border: 2px solid #fbb221;
+}
+
+.vue-slider:hover .vue-slider-dot-handle:hover {
+  border: 2px solid #fbb221;
+}
+
+.vue-slider:hover .vue-slider-dot-handle-focus {
+  border: 2px solid #fbb221;
 }
