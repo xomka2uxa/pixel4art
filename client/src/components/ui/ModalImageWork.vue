@@ -75,11 +75,35 @@
                   >
                     Вы превысили максимально допустимые картинки холста
                   </div>
-                  <div class="attention __grey">Максимально допустимые размеры картинки 800 на 600</div>
+                  <div class="attention __grey">Максимальные размеры 800 на 600</div>
                 </div>
               </div>
             </div>
           </div>
+        </div>
+      </div>
+      <div class="current-size">
+        <div class="inner__title">
+          <span>Текущее расположение</span>
+        </div>
+        <div class="inner__content">
+          <div class="flex">
+            <div class="col-30">
+              <div class="feature__title">X:</div>
+              <div class="feature__title">Y:</div>
+            </div>
+            <div class="col-70">
+              <div class="feature__title value">50</div>
+              <div class="feature__title value">230</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="new-size">
+        <div class="inner__title">
+          <span>Новое расположение</span>
+        </div>
+        <div class="inner__content__grid">
           <div class="position__wrapper">
             <p class="feature__title">Расположение:</p>
             <div class="position__inner">
@@ -157,15 +181,71 @@
               </div>
             </div>
           </div>
+          <div class="custom__size">
+            <div class="choose-size__wrapper">
+              <p class="feature__title">Задать своё положение:</p>
+              <div class="flex">
+                <div class="labels">
+                  <label for="">X:</label>
+                  <label for="">Y:</label>
+                </div>
+                <div class="inputs">
+                  <input v-model="customSizePaint.cols" type="text" @input="clickCustomCol()" />
+                  <input v-model="customSizePaint.rows" type="text" @input="clickCustomRow()" />
+                  <div class="attention" v-if="isWrongCol">Введите число</div>
+                  <div
+                    class="attention"
+                    v-if="
+                      isWrongRow == true && isSmallerCustomCol == false && isBiggerCol == false && isWrongCol == false
+                    "
+                  >
+                    Введите число
+                  </div>
+                  <div class="attention" v-if="isSmallerCustomCol">
+                    Выбранный Вами размер меньше текущего, часть изображения будет не видна на холсте
+                  </div>
+                  <div
+                    class="attention"
+                    v-if="
+                      isSmallerCustomRow == true &&
+                      isWrongCol == false &&
+                      isBiggerCol == false &&
+                      isSmallerCustomCol == false
+                    "
+                  >
+                    Выбранный Вами размер меньше текущего, часть изображения будет не видна на холсте
+                  </div>
+                  <div class="attention" v-if="isBiggerCol">Вы превысили максимально допустимые размеры картинки</div>
+                  <div
+                    class="attention"
+                    v-if="
+                      isBiggerRow == true && isWrongCol == false && isSmallerCustomCol == false && isBiggerCol == false
+                    "
+                  >
+                    Вы превысили максимально допустимые картинки холста
+                  </div>
+                  <div class="attention __grey">Максимальные размеры 800 на 600</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <div class="current-size">
         <div class="inner__title">
           <span>Прозрачность</span>
         </div>
-        <div class="inner__content">
-          <div class="feature__title">
-            <p>{{ currentSizesPaint[0] }} x {{ currentSizesPaint[1] }}</p>
+        <div class="inner__content __opacity">
+          <div>
+            <vue-slider v-model="value" class="slider__opacity" />
+            <div class="flex">
+              <div class="col-30">
+                <label for="">Непрозрачность:</label>
+              </div>
+              <div class="col-70">
+                <input v-model="value" type="text" />
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -189,15 +269,28 @@
 
 <script>
 import { mapGetters } from "vuex";
+import { reactive, toRefs } from "vue";
+import VueSlider from "vue-slider-component";
+import "vue-slider-component/theme/antd.css";
 
 export default {
   emits: {
     close: null,
   },
 
+  components: {
+    VueSlider,
+  },
+
+  setup() {
+    const data = reactive({ value: 0 });
+    return toRefs(data);
+  },
+
   data() {
     return {
       sizePaint: "",
+      value: 100,
       isSmallerSize: false,
       isSmallerCustomCol: false,
       isSmallerCustomRow: false,
@@ -381,6 +474,11 @@ export default {
     @include xss-down {
       width: 100%;
     }
+
+    &.value {
+      margin-left: 5px;
+      font-weight: 500;
+    }
   }
 
   .current-size,
@@ -417,6 +515,10 @@ export default {
       font-family: Roboto, Helvetica, Arial, sans-serif;
       font-weight: 600;
       font-size: 14px;
+
+      &.__opacity {
+        display: block;
+      }
 
       .feature__value {
         margin-left: 5px;
@@ -512,7 +614,7 @@ export default {
 }
 
 .position__wrapper {
-  grid-row: 2;
+  grid-row: 1;
 
   @include md-down {
     display: flex;
@@ -736,6 +838,10 @@ input {
   }
 }
 
+.__opacity input {
+  width: auto;
+}
+
 [data-id="top-left"] .position__value__inner {
   transform: rotate(-135deg);
 }
@@ -762,5 +868,22 @@ input {
 
 [data-id="bottom-right"] .position__value__inner {
   transform: rotate(45deg);
+}
+
+.labels {
+  margin-right: 10px;
+  label:first-child {
+    margin-bottom: 12px;
+  }
+}
+
+.inputs {
+  input:first-child {
+    margin-bottom: 10px;
+  }
+}
+
+.slider__opacity {
+  margin-bottom: 10px;
 }
 </style>
