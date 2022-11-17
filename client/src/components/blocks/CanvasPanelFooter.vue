@@ -121,13 +121,34 @@
         </icon-btn>
       </div>
     </div>
-    <div class="canvas-panel__inner">
+    <!-- <div class="canvas-panel__inner">
       <div class="canvas-panel__box info">
         <icon-btn isRound isSmall title="Быстрое обучение">
           <mdicon name="information-outline" />
         </icon-btn>
         <vue-final-modal classes="modal-container" content-class="modal-content">
           <modal-resize />
+        </vue-final-modal>
+      </div>
+    </div> -->
+    <div class="canvas-panel__inner">
+      <div class="canvas-panel__box info">
+        <icon-btn isRound isSmall title="Настройки">
+          <mdicon name="cog" />
+        </icon-btn>
+        <vue-final-modal
+          v-model="isShowModalAddPalette"
+          classes="modal-container --right"
+          :lock-scroll="false"
+          content-class="modal-content"
+        >
+          <modal-add-palette
+            @update-drawing-color="addColorToPalette"
+            @choose-color="chooseColor"
+            @close="isShowModalAddPalette = false"
+            :drawing="drawingColor"
+            :selected="selectedColor"
+          />
         </vue-final-modal>
       </div>
     </div>
@@ -248,6 +269,7 @@ export default {
 .canvas-panel {
   position: absolute;
   display: flex;
+  height: 50px;
   justify-content: space-between;
   bottom: 0;
   left: 0;

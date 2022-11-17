@@ -8,6 +8,7 @@
         { black: isBlack },
         { nested: isNested },
         { layer: isLayer },
+        { gray: isGray },
       ]"
       class="icon-btn__inner"
       :title="title"
@@ -38,6 +39,10 @@ export default {
       default: false,
     },
     isSmall: {
+      type: Boolean,
+      default: false,
+    },
+    isGray: {
       type: Boolean,
       default: false,
     },
@@ -87,6 +92,14 @@ export default {
 .blackWhite {
   &.icon-btn__inner :deep(svg) {
     fill: $black;
+  }
+}
+
+.gray {
+  &.icon-btn__inner :deep(svg) {
+    fill: $ultradark-grey;
+    height: 18px;
+    width: 18px;
   }
 }
 
@@ -152,6 +165,12 @@ export default {
 
     &.icon-btn__inner :deep(svg) {
       fill: white;
+    }
+  }
+
+  .gray {
+    &.icon-btn__inner :deep(svg) {
+      fill: $color-icon-btn;
     }
   }
 

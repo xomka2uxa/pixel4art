@@ -7,34 +7,29 @@
     <div class="popup__inner">
       <div class="current-size">
         <div class="inner__title">
-          <span>Текущий размер</span>
+          <span>Текущие параметры</span>
         </div>
         <div class="inner__content">
-          <div class="feature__title">
-            <p>{{ currentSizesPaint[0] }} x {{ currentSizesPaint[1] }}</p>
+          <div class="flex __current">
+            <div class="col-50">
+              <div class="feature__title">Расположение</div>
+              <div class="feature__title">Размер</div>
+            </div>
+            <div class="col-50">
+              <div class="feature__title value">{{ currentSizesPaint[0] }} x {{ currentSizesPaint[1] }}</div>
+              <div class="feature__title value">X: 50, Y: 230</div>
+            </div>
           </div>
         </div>
       </div>
       <div class="new-size">
         <div class="inner__title">
-          <span>Новый размер</span>
+          <span>Новые параметры</span>
         </div>
         <div class="inner__content__grid">
-          <div class="choose-size__wrapper">
-            <p class="feature__title">Выберите размер:</p>
-            <select v-model="sizePaint" @change="clickSize()" @keyup.enter="clickSize()">
-              <option v-for="(val, name) in defaultSizesPaint" :key="name" :value="val">
-                {{ getTextSizePaint(val) }}
-              </option>
-            </select>
-            <p v-if="isSmallerSize" class="attention">
-              Выбранный Вами размер меньше текущего, часть изображения будет не видна на холсте
-            </p>
-          </div>
           <div class="custom__size">
-            <div v-if="CustomDisable" class="overlay"></div>
             <div class="choose-size__wrapper">
-              <p class="feature__title">Задать свой размер:</p>
+              <p class="feature__title">Задать размер:</p>
               <div class="flex">
                 <div class="col-30">
                   <label for="">Ширина:</label>
@@ -78,112 +73,25 @@
                   <div class="attention __grey">Максимальные размеры 800 на 600</div>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="current-size">
-        <div class="inner__title">
-          <span>Текущее расположение</span>
-        </div>
-        <div class="inner__content">
-          <div class="flex">
-            <div class="col-30">
-              <div class="feature__title">X:</div>
-              <div class="feature__title">Y:</div>
-            </div>
-            <div class="col-70">
-              <div class="feature__title value">50</div>
-              <div class="feature__title value">230</div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="new-size">
-        <div class="inner__title">
-          <span>Новое расположение</span>
-        </div>
-        <div class="inner__content__grid">
-          <div class="position__wrapper">
-            <p class="feature__title">Расположение:</p>
-            <div class="position__inner">
-              <div
-                data-id="top-left"
-                class="position__value"
-                :class="{ active__position: position === 'top-left' }"
-                @click="clickPosition('top-left')"
-              >
-                <div class="position__value__inner">-></div>
-              </div>
-              <div
-                data-id="top-center"
-                class="position__value"
-                @click="clickPosition('top-center')"
-                :class="{ active__position: position === 'top-center' }"
-              >
-                <div class="position__value__inner">-></div>
-              </div>
-              <div
-                data-id="top-right"
-                class="position__value"
-                @click="clickPosition('top-right')"
-                :class="{ active__position: position === 'top-right' }"
-              >
-                <div class="position__value__inner">-></div>
-              </div>
-              <div
-                data-id="center-left"
-                class="position__value"
-                @click="clickPosition('center-left')"
-                :class="{ active__position: position === 'center-left' }"
-              >
-                <div class="position__value__inner">-></div>
-              </div>
-              <div
-                data-id="center-center"
-                class="position__value"
-                @click="clickPosition('center-center')"
-                :class="{ active__position: position === 'center-center' }"
-              >
-                <div class="position__value__inner round"></div>
-              </div>
-              <div
-                data-id="center-right"
-                class="position__value"
-                @click="clickPosition('center-right')"
-                :class="{ active__position: position === 'center-right' }"
-              >
-                <div class="position__value__inner">-></div>
-              </div>
-              <div
-                data-id="bottom-left"
-                class="position__value"
-                @click="clickPosition('bottom-left')"
-                :class="{ active__position: position === 'bottom-left' }"
-              >
-                <div class="position__value__inner">-></div>
-              </div>
-              <div
-                data-id="bottom-center"
-                class="position__value"
-                @click="clickPosition('bottom-center')"
-                :class="{ active__position: position == 'bottom-center' }"
-              >
-                <div class="position__value__inner">-></div>
-              </div>
-              <div
-                data-id="bottom-right"
-                class="position__value"
-                @click="clickPosition('bottom-right')"
-                :class="{ active__position: position === 'bottom-right' }"
-              >
-                <div class="position__value__inner">-></div>
-              </div>
+              <transition name="fade" mode="out-in" class="clip">
+                <icon-btn
+                  v-if="isClip"
+                  isGray
+                  title="Пропорции сохраняются"
+                  class="layer__btn"
+                  @click="isClip = !isClip"
+                >
+                  <mdicon name="attachment" />
+                </icon-btn>
+                <icon-btn v-else isGray class="layer__btn" title="Пропорции не сохраняются" @click="isClip = !isClip">
+                  <mdicon name="attachment-remove" />
+                </icon-btn>
+              </transition>
             </div>
           </div>
           <div class="custom__size">
             <div class="choose-size__wrapper">
-              <p class="feature__title">Задать своё положение:</p>
+              <p class="feature__title">Задать положение:</p>
               <div class="flex">
                 <div class="labels">
                   <label for="">X:</label>
@@ -231,6 +139,19 @@
           </div>
         </div>
       </div>
+      <div class="new-size">
+        <div class="inner__title">
+          <span>Миниатюра с изменениями</span>
+        </div>
+        <div class="inner__content">
+          <div class="position__wrapper">
+            <div class="position__inner flex__center __mini">
+              <div class="image__wrapper"></div>
+              <div class="canvas__wrapper"></div>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="current-size">
         <div class="inner__title">
           <span>Прозрачность</span>
@@ -269,6 +190,7 @@
 
 <script>
 import { mapGetters } from "vuex";
+import IconBtn from "@/components/ui/IconBtn.vue";
 import { reactive, toRefs } from "vue";
 import VueSlider from "vue-slider-component";
 import "vue-slider-component/theme/antd.css";
@@ -280,6 +202,7 @@ export default {
 
   components: {
     VueSlider,
+    IconBtn,
   },
 
   setup() {
@@ -291,6 +214,7 @@ export default {
     return {
       sizePaint: "",
       value: 100,
+      isClip: false,
       isSmallerSize: false,
       isSmallerCustomCol: false,
       isSmallerCustomRow: false,
@@ -547,6 +471,7 @@ export default {
 
   .inner__content__grid {
     display: grid;
+    gap: 30px;
     grid-template-rows: auto auto;
     grid-template-columns: 1fr 1fr;
     padding: 19px 12px 16px;
@@ -558,6 +483,10 @@ export default {
     @include md-down {
       grid-template-columns: 1fr;
       grid-template-rows: auto auto auto;
+    }
+
+    .custom__size:first-child {
+      padding-right: 30px;
     }
   }
 
@@ -627,11 +556,20 @@ export default {
 
   .position__inner {
     display: flex;
+    position: relative;
     flex-wrap: wrap;
     width: 81px;
     height: 81px;
     background-color: #e8e8e8;
     border: 1px solid $dark-grey;
+
+    &.__mini {
+      position: relative;
+      width: 200px;
+      height: 200px;
+      background-color: transparent;
+      align-items: center;
+    }
 
     .position__value {
       width: 33.3%;
@@ -684,7 +622,6 @@ export default {
 
 .custom__size {
   position: relative;
-  margin-right: 10px;
   grid-row: 1 / 3;
 
   @include md-down {
@@ -885,5 +822,28 @@ input {
 
 .slider__opacity {
   margin-bottom: 10px;
+}
+
+.clip {
+  position: absolute;
+  top: 30%;
+  bottom: 70%;
+  right: 3px;
+}
+
+.image__wrapper {
+  position: absolute;
+  background-color: #4f4f4f;
+  opacity: 0.7;
+  z-index: 1;
+  width: 200px;
+  height: 80px;
+}
+
+.canvas__wrapper {
+  position: absolute;
+  background-color: #9c9898;
+  width: 100px;
+  height: 100px;
 }
 </style>

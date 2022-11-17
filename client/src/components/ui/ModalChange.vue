@@ -34,7 +34,7 @@
               </div>
               <div class="flex">
                 <p class="color_name modal-container">Новый цвет:</p>
-                <div class="colors__inner" :style="{ background: choosenColor }"></div>
+                <div class="colors__inner" :style="{ background: newColor }"></div>
               </div>
             </div>
           </div>

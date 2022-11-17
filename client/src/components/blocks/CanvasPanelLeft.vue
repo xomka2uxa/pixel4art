@@ -33,6 +33,7 @@
             </div>
           </div> -->
           <div class="col">
+            <div v-if="!isImage" class="overlay"></div>
             <icon-btn isBgColor title="Загрузить картинку" @click="ShowModalImage">
               <mdicon name="image-plus" />
             </icon-btn>

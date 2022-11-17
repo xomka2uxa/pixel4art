@@ -98,6 +98,18 @@ h2 {
 .flex {
   display: flex;
   justify-content: space-between;
+
+  &.__current {
+    width: 100%;
+
+    .col-50:first-child {
+      text-align: right;
+    }
+
+    .col-50:last-child {
+      text-align: left;
+    }
+  }
 }
 
 .flex__center {
