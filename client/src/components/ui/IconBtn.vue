@@ -9,6 +9,7 @@
         { nested: isNested },
         { layer: isLayer },
         { gray: isGray },
+        { active_nest: isActiveNest },
       ]"
       class="icon-btn__inner"
       :title="title"
@@ -31,6 +32,10 @@ export default {
       default: false,
     },
     isBlack: {
+      type: Boolean,
+      default: false,
+    },
+    isActiveNest: {
       type: Boolean,
       default: false,
     },
@@ -191,6 +196,13 @@ export default {
   }
 }
 
+.active_nest {
+  background: linear-gradient(to right, $color1-gold-gradient, $color2-gold-gradient);
+
+  &.icon-btn__inner :deep(svg) {
+    fill: $bg-header;
+  }
+}
 .icon-btn.active {
   .bg_color {
     .icon-btn__overlay {

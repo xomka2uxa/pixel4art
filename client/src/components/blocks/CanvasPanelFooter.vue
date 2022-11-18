@@ -132,10 +132,21 @@
       </div>
     </div> -->
     <div class="canvas-panel__inner">
-      <div class="canvas-panel__box info">
-        <icon-btn isRound isSmall title="Настройки">
-          <mdicon name="cog" />
-        </icon-btn>
+      <div class="canvas-panel__box info" v-click-outside="ActiveNested">
+        <Popper placement="top">
+          <icon-btn
+            isRound
+            isSmall
+            :is-active-nest="isActiveNest"
+            title="Настройки"
+            @click="isActiveNest = !isActiveNest"
+          >
+            <mdicon name="cog" class="my-mdi" />
+          </icon-btn>
+          <template #content>
+            <inner-setting />
+          </template>
+        </Popper>
         <vue-final-modal
           v-model="isShowModalAddPalette"
           classes="modal-container --right"
@@ -158,14 +169,23 @@
 <script>
 import IconBtn from "@/components/ui/IconBtn.vue";
 import ModalResize from "@/components/ui/ModalResize.vue";
+import InnerSetting from "@/components/ui/InnerSetting.vue";
 import ModalDelete from "@/components/ui/ModalDelete.vue";
 import { mapGetters } from "vuex";
+import Popper from "vue3-popper";
+import vClickOutside from "click-outside-vue3";
 
 export default {
   components: {
     IconBtn,
     ModalResize,
     ModalDelete,
+    Popper,
+    InnerSetting,
+  },
+
+  directives: {
+    clickOutside: vClickOutside.directive,
   },
 
   props: ["historyList", "scaleInPrc", "x", "y", "width", "height", "cheight", "cwidth"],
@@ -179,6 +199,7 @@ export default {
       showModalInfo: false,
       doMovingFunc: null,
       isMoveDisable: false,
+      isActiveNest: false,
     };
   },
 
@@ -206,6 +227,10 @@ export default {
 
     InfoShowModal() {
       this.showModalInfo = true;
+    },
+
+    ActiveNested() {
+      this.isActiveNest = false;
     },
 
     undoLastAction() {

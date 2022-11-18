@@ -42,6 +42,7 @@
               classes="modal-container --right"
               :lock-scroll="false"
               content-class="modal-content"
+              :hide-overlay="true"
             >
               <modal-image @close="isShowModalImage = false" />
               ldfff
@@ -57,6 +58,8 @@
               classes="modal-container --right"
               :lock-scroll="false"
               content-class="modal-content"
+              :hide-overlay="true"
+              :click-to-close="false"
             >
               <modal-image-work @close="isShowModalImageWork = false" />
             </vue-final-modal>
@@ -78,6 +81,8 @@
               classes="modal-container --right"
               :lock-scroll="false"
               content-class="modal-content"
+              :hide-overlay="true"
+              :click-to-close="false"
             >
               <modal-fon
                 @update-drawing-color="updateDrawingColor"
@@ -102,6 +107,8 @@
               classes="modal-container --right"
               :lock-scroll="false"
               content-class="modal-content"
+              :hide-overlay="true"
+              :click-to-close="false"
             >
               <modal-pouring
                 @update-drawing-color="updateDrawingColor"
@@ -142,6 +149,8 @@
               classes="modal-container --right"
               :lock-scroll="false"
               content-class="modal-content"
+              :hide-overlay="true"
+              :click-to-close="false"
             >
               <modal-add-palette
                 @update-drawing-color="addColorToPalette"
@@ -391,6 +400,19 @@ export default {
   }
 }
 
+.icon__palette:hover,
+.icon__palette:active {
+  :deep(svg) {
+    fill: white;
+  }
+
+  &[disabled="true"] {
+    :deep(svg) {
+      fill: $color-icon-btn;
+    }
+  }
+}
+
 .col:not(:last-child) {
   margin-bottom: 15px;
 }
@@ -491,19 +513,6 @@ export default {
     :deep(svg) {
       cursor: not-allowed;
       opacity: 0.6;
-    }
-  }
-}
-
-.icon__palette:hover,
-.icon__palette:active {
-  :deep(svg) {
-    fill: white;
-  }
-
-  &[disabled="true"] {
-    :deep(svg) {
-      fill: $color-icon-btn;
     }
   }
 }
