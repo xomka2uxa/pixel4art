@@ -9,6 +9,28 @@
     </div> -->
     <div class="container-canvas" ref="containerCanvas">
       <canvas id="cl" ref="cl" class="canvas"></canvas>
+      <svg class="canvas-svg" :style="[svgPosition, svgSizes]">
+        <line
+          v-for="(row, i) in svgRows"
+          :key="i"
+          x1="0"
+          :y1="row"
+          x2="100%"
+          :y2="row"
+          :stroke-width="strokeWidth"
+          stroke="rgba(0, 0, 0, 1)"
+        />
+        <line
+          v-for="(col, i) in svgCols"
+          :key="i"
+          :x1="col"
+          y1="0"
+          :x2="col"
+          y2="100%"
+          :stroke-width="strokeWidth"
+          stroke="rgba(0, 0, 0, 1)"
+        />
+      </svg>
       <canvas
         id="c"
         ref="c"
@@ -58,6 +80,8 @@ import ViewModeTooltip from "@/components/blocks/ViewModeTooltip.vue";
 5. попробовать переводить в рисунок часть картинки
 6. Подставлять вместо квадратов и линий картинку если меньше одного пикселя
 8. Сохранять в локалсторадже
+9. делать ластик
+10. делать заливку фона
 
 Дебаггинг и рефакторинг - 
 1.Переписать события из саййдбара без стора Не перерисовывать если не скейлю и не перетаскиваю.
@@ -184,6 +208,40 @@ export default {
       "cntHistoryAction",
       "historyMode",
     ]),
+
+    svgPosition() {
+      return `top: ${this.gc.y}px; left: ${this.gc.x}px`;
+    },
+
+    svgSizes() {
+      return `width: ${this.gc.width}px; height: ${this.gc.height}px`;
+    },
+
+    svgRows() {
+      const rows = [];
+      for (let i = 0; i < this.cc.rows + 1; i++) {
+        rows.push(i * this.realSquareSize);
+      }
+
+      return rows;
+    },
+
+    svgCols() {
+      const rows = [];
+      for (let i = 0; i < this.cc.cols + 1; i++) {
+        rows.push(i * this.realSquareSize);
+      }
+
+      return rows;
+    },
+
+    realSquareSize() {
+      return this.isScaleInPrc ? this.cc.squareSize * this.cc.scale : this.cc.squareSize + this.cc.scale;
+    },
+
+    strokeWidth() {
+      return this.isScaleInPrc ? "0.1" : "0.2";
+    },
   },
 
   methods: {
@@ -191,7 +249,6 @@ export default {
       if (this.isDragging) {
         this.clearCanvas();
         this.drawGroup();
-        this.drawLines();
         this.drawRectList();
       }
 
@@ -268,24 +325,6 @@ export default {
       this.ctxL.lineWidth = 1;
       this.ctxL.fillRect(this.gc.x, this.gc.y, this.gc.width, this.gc.height);
       this.ctxL.strokeRect(this.gc.x, this.gc.y, this.gc.width, this.gc.height);
-    },
-
-    drawLines() {
-      const squareSize = this.isScaleInPrc ? this.cc.squareSize * this.cc.scale : this.cc.squareSize + this.cc.scale;
-      this.ctxL.beginPath();
-      for (let i = 0; i < this.cc.rows + 1; i++) {
-        this.ctxL.moveTo(this.gc.x, this.gc.y + i * squareSize);
-        this.ctxL.lineTo(this.gc.x + this.gc.width, this.gc.y + i * squareSize);
-      }
-
-      for (let i = 0; i < this.cc.cols + 1; i++) {
-        this.ctxL.moveTo(this.gc.x + i * squareSize, this.gc.y);
-        this.ctxL.lineTo(this.gc.x + i * squareSize, this.gc.y + this.gc.height);
-      }
-
-      this.ctxL.strokeStyle = "#000";
-      this.ctxL.lineWidth = squareSize / 20;
-      this.ctxL.stroke();
     },
 
     drawRectList() {
@@ -726,5 +765,9 @@ export default {
     width: 33%;
     padding: 0 10px;
   }
+}
+
+.canvas-svg {
+  position: absolute;
 }
 </style>
