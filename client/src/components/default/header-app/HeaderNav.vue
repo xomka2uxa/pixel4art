@@ -1,7 +1,7 @@
 <template>
   <div :class="['header-nav', isOpenMenu ? '_open' : '']">
     <menu-close @close="$emit('close')" />
-    <header-menu />
+    <header-menu @click="$emit('close')" />
   </div>
 </template>
 
