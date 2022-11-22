@@ -109,6 +109,7 @@
               content-class="modal-content"
               :hide-overlay="true"
               :click-to-close="false"
+              :prevent-click="true"
             >
               <modal-pouring
                 @update-drawing-color="updateDrawingColor"
