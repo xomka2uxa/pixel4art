@@ -380,10 +380,6 @@ export default {
     top: 0;
   }
 
-  @include xl-down {
-    top: 0;
-  }
-
   &__inner {
     padding: 10px 10px 75px;
     height: 100%;

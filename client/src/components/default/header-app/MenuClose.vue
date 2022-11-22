@@ -1,25 +1,33 @@
 <template>
   <div class="menu-close" @click="$emit('close')">
-    <a class="menu-close__icon" href="#"></a>
+    <mdicon name="close" class="menu-close__icon" />
   </div>
 </template>
 
 <style lang="scss" scoped>
 .menu-close {
-  display: block;
-  position: absolute;
-  top: 0;
-  right: 10px;
-
-  @media (min-width: 992px) {
-    display: none;
+  display: none;
+  @include lg-down {
+    display: block;
+    position: absolute;
+    top: 10px;
+    right: 10px;
   }
+
   &__icon {
-    &:after {
-      content: "×";
-      color: rgb(140, 137, 137);
-      font-size: 40px;
-      font-family: arial, sans-serif;
+    :deep(svg) {
+      fill: white;
+      transition: fill 0.3s;
+      width: 25px;
+      height: 25px;
+    }
+  }
+
+  &:hover {
+    .menu-close__icon {
+      :deep(svg) {
+        fill: #fbc221;
+      }
     }
   }
 }

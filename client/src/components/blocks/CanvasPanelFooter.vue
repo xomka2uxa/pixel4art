@@ -302,7 +302,7 @@ export default {
   background-color: $bg-header;
   color: #fff;
   padding: 7px 0;
-  z-index: 5;
+  z-index: 4;
   box-shadow: 0 -4px 7px 0 rgba(0, 0, 0, 0.35);
 
   @include sm-down {

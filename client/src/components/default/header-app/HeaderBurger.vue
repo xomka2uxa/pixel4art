@@ -1,8 +1,14 @@
 <template>
   <div class="header-burger" @click="$emit('open')">
-    <mdicon name="menu" class="preheader-soc" />
+    <mdicon name="menu" class="header__icon" />
   </div>
 </template>
+
+<script>
+export default {
+  props: ["isHeaderCanClosed"],
+};
+</script>
 
 <style lang="scss" scoped>
 .header-burger {

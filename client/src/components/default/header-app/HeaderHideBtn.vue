@@ -1,6 +1,16 @@
 <template>
-  <div href="#" class="header-hide-btn" v-if="isHeaderCanClosed" @click="$store.dispatch('header/toggleHeaderHidden')">
-    <mdicon name="arrow-up-thick" class="preheader-soc" />
+  <div class="hide-btn">
+    <div
+      href="#"
+      class="hide-btn__inner"
+      v-if="isHeaderCanClosed"
+      @click="$store.dispatch('header/toggleHeaderHidden')"
+    >
+      <transition name="fade" mode="out-in">
+        <mdicon v-if="!isHeaderHidden" name="arrow-up" class="hide-btn__icon" />
+        <mdicon v-else name="arrow-down" class="hide-btn__icon" />
+      </transition>
+    </div>
   </div>
 </template>
 
@@ -9,33 +19,42 @@ import { mapGetters } from "vuex";
 
 export default {
   computed: {
-    ...mapGetters("header", ["isHeaderCanClosed"]),
+    ...mapGetters("header", ["isHeaderCanClosed", "isHeaderHidden"]),
   },
 };
 </script>
 
 <style lang="scss" scoped>
-.header-hide-btn {
-  position: relative;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background-color: rgba(255, 255, 255, 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background 0.25s;
+.hide-btn {
+  position: absolute;
+  bottom: -22px;
+  border-radius: 2px;
+  right: 0;
+  padding: 5px;
+  background-color: $bg-header;
 
-  &:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-  }
+  &__inner {
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
 
-  @media (max-width: 980px) {
-    background-color: rgba(255, 255, 255, 0.1);
+    .hide-btn__icon {
+      :deep(svg) {
+        fill: white;
+        transition: fill 0.3s;
+        width: 13px;
+        height: 13px;
+      }
+    }
 
     &:hover {
-      background-color: rgba(255, 255, 255, 0.2);
+      .hide-btn__icon {
+        :deep(svg) {
+          fill: #fbc221;
+        }
+      }
     }
   }
 }

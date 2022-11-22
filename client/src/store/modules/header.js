@@ -4,7 +4,6 @@ export default {
     isHeaderTransparent: false,
     isHeaderCanClosed: false,
     isHeaderHidden: false,
-    isHeaderHiddenMobile: false,
   },
 
   getters: {
@@ -18,10 +17,6 @@ export default {
 
     isHeaderHidden(state) {
       return state.isHeaderHidden;
-    },
-
-    isHeaderHiddenMobile(state) {
-      return state.isHeaderHiddenMobile;
     },
   },
 
@@ -37,10 +32,6 @@ export default {
     toggleHeaderHidden(state) {
       state.isHeaderHidden = !state.isHeaderHidden;
     },
-
-    setHeaderHideMobile(state, flag) {
-      state.isHeaderHiddenMobile = flag;
-    },
   },
 
   actions: {
@@ -54,10 +45,6 @@ export default {
 
     toggleHeaderHidden({ commit }) {
       commit("toggleHeaderHidden");
-    },
-
-    setHeaderHideMobile({ commit }, flag) {
-      commit("setHeaderHideMobile", flag);
     },
   },
 };
